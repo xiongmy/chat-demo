@@ -1,0 +1,11 @@
+.left-bar{
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-right:1px solid #ccc ;
+}
+
+::v-deep .left-bar .ant-conversations .ant-conversations-item{
+  width: 100%
+  
+}
