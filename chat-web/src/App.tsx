@@ -4,7 +4,7 @@ import { Layout, theme } from 'antd';
 import Chat from './views/Chat.tsx'
 import LeftBar from './views/LeftBar.tsx'
 import './App.css'
-const { Header, Footer, Sider } = Layout;
+const { Header, Sider } = Layout;
 
 const App: React.FC = () => {
   const {
@@ -12,28 +12,29 @@ const App: React.FC = () => {
   } = theme.useToken();
 
   return (
-    <Layout style={{height:'100vh'}}>
+    <Layout className={'bg-blue-500'}>
       <Sider
-       theme='light'
+        theme='light'
         breakpoint="lg"
         collapsedWidth="0"
         defaultCollapsed={true}
         onBreakpoint={(broken) => {
           console.log(broken);
         }}
-        onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
+        onCollapse={(collapsed) => {
+          var winWidth = document.body.clientWidth;
+          console.log(collapsed);
+          const width = collapsed ? winWidth + 'px' : (winWidth - 200) + 'px'
+          console.log(width)
+          document.getElementById('content')?.setAttribute('width', width)
         }}
       >
         <div className="logo">LOGO</div>
-        <LeftBar/>
+        <LeftBar />
       </Sider>
-      <Layout>
-        <Header style={{ background: '#666', color:'#FFF', fontSize:'18px', textAlign:'center' }}>AI会话</Header>
-        <Chat/>
-        <Footer style={{ textAlign: 'center' }}>
-          {new Date().getFullYear() + '.' + (new Date().getMonth()+1) + '.' + new Date().getDate()}
-        </Footer>
+      <Layout id='content'>
+        <Header style={{ background: '#666', color: '#FFF', fontSize: '18px', textAlign: 'center' }}>AI会话</Header>
+        <Chat />
       </Layout>
     </Layout>
   );

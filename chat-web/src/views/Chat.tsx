@@ -1,8 +1,9 @@
 import { UserOutlined } from '@ant-design/icons';
 import { Bubble, Sender } from '@ant-design/x';
-import { Flex, type GetProp } from 'antd';
+import { Col, Flex, Layout, type GetProp } from 'antd';
 import { useState } from 'react';
 import axios from "axios"
+const { Footer } = Layout;
 
 
 const roles: GetProp<typeof Bubble.List, 'roles'> = {
@@ -37,39 +38,47 @@ const Chat = () => {
     })
       .then(function (response) {
         console.log(response.data)
-        addBubbles({role:'ai', message:response.data})
+        addBubbles({ role: 'ai', message: response.data })
       });
   }
-  const addBubbles = (bubble:BubbleType) => {
+  const addBubbles = (bubble: BubbleType) => {
     setBubbles([...bubbles, {
-      role:bubble.role,
-      message:bubble.message
+      role: bubble.role,
+      message: bubble.message
     }])
   }
 
-  const afterInput = (msg:string) => {
-    addBubbles({role:'local',message:msg})
+  const afterInput = (msg: string) => {
+    addBubbles({ role: 'local', message: msg })
     onRequest('user', msg);
     setContent('')
   }
 
   return (
-    <Flex vertical gap="middle">
+    <div style={{width:'100%'}}>
       <Bubble.List
-        style={{ maxHeight: 300 }}
         roles={roles}
         items={bubbles.map((item, i) => {
           return { key: i, role: item.role, content: item.message };
         })}
       />
-      <Sender
-        value={content}
-        onChange={setContent}
-        onSubmit={(nextContent) => {
-          afterInput(nextContent);
-        }}
-      />
-    </Flex>
+      <div
+        style={{width:'100%' }}
+      >
+        <Sender
+        style={{width:'80%',maxWidth:'500px',margin:'0 auto'}}
+          value={content}
+          onChange={setContent}
+          onSubmit={(nextContent) => {
+            afterInput(nextContent);
+          }}
+        />
+        <Footer style={{ textAlign: 'center' }}>
+          {new Date().getFullYear() + '.' + (new Date().getMonth()+1) + '.' + new Date().getDate()}
+        </Footer>
+      </div>
+
+    </div>
   );
 };
 
