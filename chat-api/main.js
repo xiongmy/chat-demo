@@ -12,10 +12,10 @@ const openai = new OpenAI({
 });
 
 async function sendReq(role, content) {
-    
     const completion = await openai.chat.completions.create({
         messages: [{ role, content }],
         model: "deepseek-chat",
+        stream:false
     });
 
     return completion.choices[0].message.content
