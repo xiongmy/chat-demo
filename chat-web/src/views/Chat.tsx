@@ -1,10 +1,9 @@
 import { RobotOutlined, UserOutlined } from '@ant-design/icons';
 import { Bubble, Sender, Welcome } from '@ant-design/x';
 import type { BubbleProps } from '@ant-design/x';
-import { Layout, type GetProp, Typography } from 'antd';
-import { useState, useEffect } from 'react';
+import { Layout, Typography } from 'antd';
+import { useState, useRef } from 'react';
 import markdownit from 'markdown-it';
-import axios from "axios"
 import { BubbleType, HistoryType } from './propsType'
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
@@ -20,73 +19,10 @@ const renderMarkdown: BubbleProps['messageRender'] = (content) => (
 const Chat = () => {
   const [content, setContent] = useState('');
   const [bubbles, setBubbles] = useState<BubbleType[]>([])
-  const [history, setHistory] = useState<HistoryType[]>([])
+  const messageRef: HTMLDivElement = useRef<any>(null)
 
-  const onRequest = (role = 'user', content = '') => {
+  const startStream = async (role = 'user', content = '') => {
     let startTime = new Date().getTime();
-    let newBubble: BubbleType = {}
-    // axios.post('/llms/openai/chat/completions', {
-    //   model: 'deepseek-chat',
-    //   stream: true,
-    //   messages: [{
-    //     content,
-    //     role,
-    //     name: 'user'
-    //   }]
-    //   },
-    //   {
-    //     headers: {
-    //       'responseType': 'stream'
-    //     }
-    //   })
-    axios({
-      method: 'post',
-      url: '/llms/openai/chat/completions',
-      responseType: 'stream',
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: {
-        model: 'deepseek-chat',
-        stream: true,
-        messages: [{
-          content,
-          role,
-          name: 'user'
-        }]
-      }
-    })
-      .then(async function (response: any) {
-        // let endTime = new Date().getTime();
-        // console.log('思考时间：' + Math.floor((endTime - startTime) / 1000) + ' s')
-        // newBubble = { role: 'ai', content: response.data }
-        // console.log
-        response.data.on("data", (chunk: any) => {
-          console.log(chunk, "data");
-          // 处理每个数据块，例如写入文件或进行其他操作
-        });
-
-        response.data.on("end", (end: any) => {
-          console.log(end, "end");
-          // 数据接收完毕的处理逻辑
-        });
-
-        response.data.on("error", () => {
-          // 流处理过程中发生错误的处理逻辑
-          console.log('err')
-        });
-
-        // setBubbles(bubbles => [...bubbles.slice(0, bubbles.length - 1), { role: 'ai', content: response.data }])
-      }).catch((err) => {
-        console.log(err)
-        // setBubbles(bubbles => [...bubbles.slice(0, bubbles.length - 1), { role: 'ai', content: 'catch error', }])
-        newBubble = { role: 'ai', content: 'catch error', }
-
-      }).finally(() => {
-        setBubbles(bubbles => [...bubbles.slice(0, bubbles.length - 1), newBubble])
-      })
-  }
-  const getStream = async (role = 'user', content = '') => {
     const data = {
       model: 'deepseek-chat',
       stream: true,
@@ -96,53 +32,40 @@ const Chat = () => {
         name: 'user'
       }]
     }
-    const res: any = await fetch('/llms/openai/chat/completions', {
+    let newContent = ''
+    await fetchEventSource('/llms/openai/chat/completions', {
       method: 'POST',
-      mode: "cors",
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
-    });
-    console.log(res)
-    // 获取 reader
-    const reader = res.body.getReader();
-
-    // 读取数据
-    return reader.read().then(function process({ done, value }) {
-      if (done) {
-        console.log('Stream finished');
-        return;
+      onmessage(event) {
+        // 接收服务器发送的每条事件
+        const res = event.data
+        newContent += JSON.parse(res).choices[0].delta.content
+        setBubbles(bubbles => [...bubbles.slice(0, bubbles.length - 1), { role: 'ai', content: newContent, }])
+        messageRef.current.scrollTop = messageRef.current.scrollHeight
+      },
+      onclose() {
+        let endTime = new Date().getTime();
+        console.log('思考时间：' + Math.floor((endTime - startTime) / 1000) + ' s')
+      },
+      onerror(err) {
+        // 错误处理（默认会抛出异常并自动重试）
+        console.error('错误:', err);
+        throw err; // 抛出错误会触发重试机制
       }
-
-      console.log('Received data chunk', value);
-
-      // 读取下一段数据
-      return reader.read().then(process);
     });
-    // const reader = res.body.getReader();
-    // const decoder = new TextDecoder();
-    // while (1) {
-    //   // 读取数据流的第一块数据，done表示数据流是否完成，value表示当前的数
-    //   const { done, value } = await reader.read();
-    //   if (done) break;
-    //   console.log(JSON.stringify(value))
-    //   const text: any = decoder.decode(value);
-    //   console.log(text)
-    //   // 打印第一块的文本内容
-    //   console.log(typeof text, done);
-    // }
   }
 
   const afterInput = (msg: string) => {
     setBubbles([...bubbles, { role: 'local', content: msg }, { role: 'ai', content: '...', loading: true }])
-    getStream('user', msg);
+    startStream('user', msg);
     setContent('')
   }
   const bubbleEle = () => {
     const elements = bubbles.map((bubble, i) =>
       <Bubble
-        typing
         key={i}
         loading={bubble.loading}
         placement={bubble.role === 'ai' ? 'start' : 'end'}
@@ -160,6 +83,7 @@ const Chat = () => {
     <div className='w-full h-full relative'>
       <Header style={{ background: '#666', color: '#FFF', fontSize: '18px', textAlign: 'center' }}>AI会话</Header>
       {bubbles.length ? <div
+        ref={messageRef}
         className='bg-gray-100 m-4 rounded-sm p-2 overflow-y-auto'
         style={{ maxHeight: '80%' }}
 
