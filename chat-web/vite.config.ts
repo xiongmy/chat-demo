@@ -8,8 +8,8 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         proxy: {
-            '/llms': {
-                target: 'http://10.168.1.117:8000',
+            '/api': {
+                target: 'http://10.168.1.117:20770',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, '')
             }

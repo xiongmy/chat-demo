@@ -4,8 +4,10 @@ import type { BubbleProps } from '@ant-design/x';
 import { Layout, Typography } from 'antd';
 import { useState, useRef } from 'react';
 import markdownit from 'markdown-it';
-import { BubbleType, HistoryType } from './propsType'
+import Title from './../components/Title';
+import { BubbleType } from '../props'
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import './Chat.css'
 
 
 const { Header } = Layout;
@@ -16,7 +18,7 @@ const renderMarkdown: BubbleProps['messageRender'] = (content) => (
   </Typography>
 );
 
-const Chat = () => {
+const Chat = ({agent}) => {
   const [content, setContent] = useState('');
   const [bubbles, setBubbles] = useState<BubbleType[]>([])
   const messageRef: HTMLDivElement = useRef<any>(null)
@@ -81,14 +83,12 @@ const Chat = () => {
 
   return (
     <div className='w-full h-full relative'>
-      <Header style={{ background: '#666', color: '#FFF', fontSize: '18px', textAlign: 'center' }}>AI会话</Header>
+      <Title text={`桌面助手${agent}`}/>
       {bubbles.length ? <div
         ref={messageRef}
         className='bg-gray-100 m-4 rounded-sm p-2 overflow-y-auto'
         style={{ maxHeight: '80%' }}
-
       >{bubbleEle()}</div> : <div className='w-3/5 m-auto my-2'>
-
         <Welcome
           icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
           title="你好"
@@ -100,7 +100,7 @@ const Chat = () => {
         className='w-full absolute bottom-0'
       >
         <Sender
-          className='w-4/5 m-auto  '
+          className='w-4/5 m-auto'
           style={{ maxWidth: '500px', maxHeight: '100px' }}
           value={content}
           allowSpeech
