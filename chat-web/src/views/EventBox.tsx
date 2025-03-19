@@ -1,11 +1,20 @@
-import { Collapse, Badge } from 'antd';
+import { Collapse,Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import {
   UserOutlined,
   RobotOutlined
 } from '@ant-design/icons';
+import type { BubbleProps } from '@ant-design/x';
 import Title from '../components/Title'
 import { getAgentMessage } from "../http"
+import markdownit from 'markdown-it';
+import './EventBox.css'
+const md = markdownit({ html: true, breaks: true });
+const renderMarkdown: BubbleProps['messageRender'] = (content) => (
+  <Typography>
+    <div dangerouslySetInnerHTML={{ __html: md.render(content) }} />
+  </Typography>
+);
 interface MessageData {
   type: string,
   msg_id: string,
@@ -32,7 +41,7 @@ const EventBox = ({ agent = 'simple-chat' }) => {
             role: msg.role,
             name: msg.name,
             seq: msg.seq,
-            children: <p>{msg.content}</p>
+            children: renderMarkdown(msg.content)
           }
         ))
       setMessages([...list])
@@ -42,8 +51,8 @@ const EventBox = ({ agent = 'simple-chat' }) => {
     console.log(key);
   };
   return (
-    <div className='left-bar'>
-      <Title text={`事件列表${agent}`} />
+    <div className='message-box'>
+      <Title text={`消息列表${agent}`} />
       <Collapse items={messages} defaultActiveKey={['1']} onChange={onChange} />
     </div>
   );

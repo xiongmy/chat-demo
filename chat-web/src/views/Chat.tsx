@@ -1,7 +1,7 @@
 import { RobotOutlined, UserOutlined } from '@ant-design/icons';
 import { Bubble, Sender, Welcome } from '@ant-design/x';
 import type { BubbleProps } from '@ant-design/x';
-import { Layout, Typography } from 'antd';
+import { Typography } from 'antd';
 import { useState, useRef } from 'react';
 import markdownit from 'markdown-it';
 import Title from './../components/Title';
@@ -10,7 +10,6 @@ import { fetchEventSource } from '@microsoft/fetch-event-source';
 import './Chat.css'
 
 
-const { Header } = Layout;
 const md = markdownit({ html: true, breaks: true });
 const renderMarkdown: BubbleProps['messageRender'] = (content) => (
   <Typography>
@@ -18,7 +17,7 @@ const renderMarkdown: BubbleProps['messageRender'] = (content) => (
   </Typography>
 );
 
-const Chat = ({agent}) => {
+const Chat = ({ agent }) => {
   const [content, setContent] = useState('');
   const [bubbles, setBubbles] = useState<BubbleType[]>([])
   const messageRef: HTMLDivElement = useRef<any>(null)
@@ -83,18 +82,19 @@ const Chat = ({agent}) => {
 
   return (
     <div className='w-full h-full relative'>
-      <Title text={`桌面助手${agent}`}/>
-      {bubbles.length ? <div
-        ref={messageRef}
-        className='bg-gray-100 m-4 rounded-sm p-2 overflow-y-auto'
-        style={{ maxHeight: '80%' }}
-      >{bubbleEle()}</div> : <div className='w-3/5 m-auto my-2'>
-        <Welcome
-          icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-          title="你好"
-          description="欢迎开启美好的一天，希望能帮助你"
-        />
-      </div>
+      <Title text={`桌面助手${agent}`} />
+      {bubbles.length ?
+        <div
+          ref={messageRef}
+          className='bg-gray-100 m-4 rounded-sm p-2 overflow-y-auto'
+          style={{ maxHeight: '80%' }}
+        >{bubbleEle()}</div> : <div className='w-3/5 m-auto my-2'>
+          <Welcome
+            icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
+            title="你好"
+            description="欢迎开启美好的一天，希望能帮助你"
+          />
+        </div>
       }
       <div
         className='w-full absolute bottom-0'
