@@ -1,7 +1,29 @@
-.message-box{
-  max-height:100%;
-  overflow-y:auto ;
+.message-box {
+  max-height: 100%;
+
 }
-.message-box .ant-collapse {
+
+.message-list {
+  max-height: calc(100vh - 40px);
+  overflow-y: Auto;
+  overflow-x: hidden;
+}
+
+.message-list .ant-collapse {
+  width: 100%;
   border-radius: 0;
+}
+
+.message-list .ant-collapse .ant-collapse-header-text {
+  width: 100%;
+}
+
+.ellipsis-text {
+  width: 95%;
+  overflow: hidden;
+  /* 隐藏超出容器的文本 */
+  white-space: nowrap;
+  /* 保持文本在一行内显示 */
+  text-overflow: ellipsis;
+  /* 文本溢出时显示省略号 */
 }

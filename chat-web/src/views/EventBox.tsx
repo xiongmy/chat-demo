@@ -1,8 +1,9 @@
-import { Collapse,Typography } from 'antd';
+import { Button, Collapse,Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import {
   UserOutlined,
-  RobotOutlined
+  RobotOutlined,
+  ReloadOutlined
 } from '@ant-design/icons';
 import type { BubbleProps } from '@ant-design/x';
 import Title from '../components/Title'
@@ -27,15 +28,21 @@ interface MessageData {
 const EventBox = ({ agent = 'simple-chat' }) => {
   const [messages, setMessages] = useState<MessageData[]>([])
   useEffect(() => {
+    getList()
+  }, [])
+  // const onChange = (key: string | string[]) => {
+  //   console.log(key);
+  // };
+  const getList = ()=>{
     getAgentMessage(agent).then(res => {
-      const list = res.data.messages.map(
+      const list = res.data.messages.reverse().map(
         (msg: MessageData) => (
           {
             key: msg.msg_id,
             type: msg.type,
-            label: <p>
-              {msg.role === `user` ? <UserOutlined /> : <RobotOutlined />} 
-              <span>{msg.content.substring(0, 10)}</span>
+            label: <p className={'ellipsis-text'}>
+              {msg.role === `user` ? <UserOutlined className={'mr-1'} /> : <RobotOutlined className={'mr-1'} />} 
+              {msg.content}
             </p>,
             content: msg.content,
             role: msg.role,
@@ -46,14 +53,14 @@ const EventBox = ({ agent = 'simple-chat' }) => {
         ))
       setMessages([...list])
     })
-  }, [])
-  const onChange = (key: string | string[]) => {
-    console.log(key);
-  };
+  }
   return (
-    <div className='message-box'>
-      <Title text={`消息列表${agent}`} />
-      <Collapse items={messages} defaultActiveKey={['1']} onChange={onChange} />
+    <div className='message-box relative'>
+      <Title text={`消息列表`} />
+      <div className='absolute top-1 right-20 cursor-pointer text-blue-500' onClick={getList}><ReloadOutlined className='text-xl' /></div>
+      <div className='message-list relative'>
+        <Collapse items={messages} defaultActiveKey={['1']}  />
+      </div>
     </div>
   );
 };

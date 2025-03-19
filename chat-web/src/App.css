@@ -1,9 +1,13 @@
+@import "tailwindcss";
+@import "./assets/dark.css";
+@import "./assets/Light.css";
+
 body{
   margin: 0;
 }
 #root {
   height: 100vh;
-  background: #24252a;
+  background: var(--bgColor);
 }
 .logo{
   width: 100%;
@@ -18,4 +22,8 @@ body{
   box-sizing: content-box;
   border-left:1px solid #ddd;
   border-right:1px solid #ddd;
+}
+.color-set{
+  background: var(--bgColor);
+  color: var(--textMainColor);
 }

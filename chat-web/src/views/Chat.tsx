@@ -5,9 +5,11 @@ import { Typography } from 'antd';
 import { useState, useRef } from 'react';
 import markdownit from 'markdown-it';
 import Title from './../components/Title';
-import { BubbleType } from '../props'
+import { BubbleType } from './../props'
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { sendMessage, pullMessageId, getMessageContent } from './../http'
 import './Chat.css'
+import welcomePng from './../assets/welcome.png'
 
 
 const md = markdownit({ html: true, breaks: true });
@@ -58,11 +60,26 @@ const Chat = ({ agent }) => {
       }
     });
   }
+  const sendAndReceiveMsg = async (content: string) => {
+    await sendMessage(content, '')
+    let msgId = null;
+    while (!msgId) {
+      msgId = await pullMessageId();
+      if (!msgId) await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    // 3. 获取消息内容
+    const reply = await getMessageContent(msgId);
+    console.log("完整回复:", reply);
+    setBubbles(bubbles => [...bubbles.slice(0, bubbles.length - 1), { role: 'ai', content: reply, }])
+        messageRef.current.scrollTop = messageRef.current.scrollHeight
+  }
 
   const afterInput = (msg: string) => {
     setBubbles([...bubbles, { role: 'local', content: msg }, { role: 'ai', content: '...', loading: true }])
-    startStream('user', msg);
     setContent('')
+    // startStream('user', msg);
+    sendAndReceiveMsg(msg)
   }
   const bubbleEle = () => {
     const elements = bubbles.map((bubble, i) =>
@@ -86,11 +103,11 @@ const Chat = ({ agent }) => {
       {bubbles.length ?
         <div
           ref={messageRef}
-          className='bg-gray-100 m-4 rounded-sm p-2 overflow-y-auto'
+          className='m-4 rounded-sm p-2 overflow-y-auto'
           style={{ maxHeight: '80%' }}
         >{bubbleEle()}</div> : <div className='w-3/5 m-auto my-2'>
           <Welcome
-            icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
+            icon={<img src={welcomePng}/>}
             title="你好"
             description="欢迎开启美好的一天，希望能帮助你"
           />

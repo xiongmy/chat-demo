@@ -1,0 +1,6 @@
+[data-theme="dark"] {
+    --bgColor: #131e29;
+    --textMainColor: #fff;
+    --textSecondColor: #eee;
+    --borderColor: #eee
+}

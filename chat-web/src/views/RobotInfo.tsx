@@ -47,9 +47,9 @@ const RobotInfo = ({ agent = '', modes = [] }) => {
           <RobotOutlined />
         </div>
         <div className='ml-2'>
-          <p className='text-base leading-6 text-gray-700'>Hi, 你好</p>
+          <p className='text-base leading-6'>Hi, 你好</p>
           {ip ?
-            <p className='text-sm leading-6 text-gray-500'>IP: {ip} <Button type='link' size="small" onClick={()=>setIp('')}>断开</Button></p> 
+            <p className='text-sm leading-6'>IP: {ip} <Button type='link' size="small" onClick={()=>setIp('')}>断开</Button></p> 
             :
             <Button type="primary" size="small" onClick={showModal}>连接</Button>
           }
