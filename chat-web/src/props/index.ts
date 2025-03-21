@@ -19,9 +19,10 @@ export interface Mode {
 }
 
 export interface BubbleType {
+    id?: string,
     role?: string,
     content?: string,
-    loading?: boolean
+    created?: number,
 }
 export interface HistoryType {
     messageId: number,

@@ -1,96 +1,117 @@
-import { RobotOutlined, UserOutlined } from '@ant-design/icons';
+import { RobotOutlined, UserOutlined, CopyOutlined } from '@ant-design/icons';
 import { Bubble, Sender, Welcome } from '@ant-design/x';
 import type { BubbleProps } from '@ant-design/x';
-import { Typography } from 'antd';
-import { useState, useRef } from 'react';
+import { Button } from 'antd'
+import { useState, useRef, useEffect } from 'react';
 import markdownit from 'markdown-it';
 import Title from './../components/Title';
 import { BubbleType } from './../props'
-import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { sendMessage, pullMessageId, getMessageContent } from './../http'
+import { timestampToLocal } from './../utils'
+import { sendMessage, pullMessageId, getAgentMessage, BASE_URL, interruptMessage } from './../http'
 import './Chat.css'
 import welcomePng from './../assets/welcome.png'
 
-
 const md = markdownit({ html: true, breaks: true });
 const renderMarkdown: BubbleProps['messageRender'] = (content) => (
-  <Typography>
+  <div>
     <div dangerouslySetInnerHTML={{ __html: md.render(content) }} />
-  </Typography>
+  </div>
 );
 
-const Chat = ({ agent }) => {
+const Chat = ({ agent = 'coco' }) => {
   const [content, setContent] = useState('');
   const [bubbles, setBubbles] = useState<BubbleType[]>([])
-  const messageRef: HTMLDivElement = useRef<any>(null)
+  const [streamBubble, setStreamBubble] = useState<BubbleType[]>([])
+  const messageRef = useRef<HTMLInputElement>(null)
+  const [senderLoading, setSenderLoading] = useState(false)
 
-  const startStream = async (role = 'user', content = '') => {
-    let startTime = new Date().getTime();
-    const data = {
-      model: 'deepseek-chat',
-      stream: true,
-      messages: [{
-        content,
-        role,
-        name: 'user'
-      }]
+  useEffect(() => {
+    const timer = setInterval(() => { receiveMsg() }, 1000)
+    updateBubbles()
+    return () => {
+      clearInterval(timer);
+    };
+  }, [])
+  useEffect(() => {
+    if (messageRef.current !== null) {
+      messageRef.current.scrollTop = messageRef.current.scrollHeight
     }
-    let newContent = ''
-    await fetchEventSource('/llms/openai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-      onmessage(event) {
-        // 接收服务器发送的每条事件
-        const res = event.data
-        newContent += JSON.parse(res).choices[0].delta.content
-        setBubbles(bubbles => [...bubbles.slice(0, bubbles.length - 1), { role: 'ai', content: newContent, }])
-        messageRef.current.scrollTop = messageRef.current.scrollHeight
-      },
-      onclose() {
-        let endTime = new Date().getTime();
-        console.log('思考时间：' + Math.floor((endTime - startTime) / 1000) + ' s')
-      },
-      onerror(err) {
-        // 错误处理（默认会抛出异常并自动重试）
-        console.error('错误:', err);
-        throw err; // 抛出错误会触发重试机制
-      }
-    });
+  }, [bubbles, streamBubble])
+  const updateBubbles = async () => {
+    const { data } = await getAgentMessage(agent)
+    const list = data.messages.map(msg => { return { role: msg.role, content: msg.content, msgId: msg.msg_id, created: msg.created } })
+    setBubbles([...list])
   }
-  const sendAndReceiveMsg = async (content: string) => {
+  const sendMsg = async (content: string) => {
+    if (streamBubble.length > 0) {
+      // 消息中断
+      await interruptMessage(agent)
+    }
     await sendMessage(content, '')
+    setStreamBubble([{ role: 'user', content }])
+    setSenderLoading(true)
+    setTimeout(() => {
+      setSenderLoading(false)
+    }, 1000);
+  }
+
+  const receiveMsg = async () => {
     let msgId = null;
-    while (!msgId) {
-      msgId = await pullMessageId();
-      if (!msgId) await new Promise(resolve => setTimeout(resolve, 1000));
+    msgId = await pullMessageId();
+    let msgRole = ''
+    if (msgId) {
+      // 3. 获取消息内容
+      let fullContent = "";
+      let done = false;
+      let created = 0;
+      while (!done) {
+        const response = await fetch(`${BASE_URL}/messages/agents/${agent}/pull`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ msg_id: msgId }) // 需要获取内容的消息唯一标识符
+        });
+
+        const data = await response.json();
+        done = data.done; // 是否已获取完所有消息块，true表示已完成
+
+        if (data.chunk) {
+          msgRole = data.chunk.role
+          if (data.chunk.seq === 'complete') {
+            fullContent = data.chunk.content; // 消息文本内容
+            created = data.chunk.created
+          } else {
+            fullContent += data.chunk.content; // 消息文本内容
+          }
+
+          // console.log("收到部分回复:", data.chunk.content);
+          setStreamBubble([{ role: data.chunk.role, content: fullContent, id: data.chunk.msg_id, created }])
+        }
+      }
+      console.log("完整回复:", fullContent);
+      setStreamBubble([])
+      const list = [...streamBubble, { role: msgRole, content: fullContent, id: msgId, }]
+      setBubbles(bubbles => [...bubbles, ...list])
     }
-
-    // 3. 获取消息内容
-    const reply = await getMessageContent(msgId);
-    console.log("完整回复:", reply);
-    setBubbles(bubbles => [...bubbles.slice(0, bubbles.length - 1), { role: 'ai', content: reply, }])
-        messageRef.current.scrollTop = messageRef.current.scrollHeight
   }
 
+  const copyContent = (text: string) => {
+    console.log(text)
+  }
   const afterInput = (msg: string) => {
-    setBubbles([...bubbles, { role: 'local', content: msg }, { role: 'ai', content: '...', loading: true }])
     setContent('')
-    // startStream('user', msg);
-    sendAndReceiveMsg(msg)
+    sendMsg(msg)
   }
-  const bubbleEle = () => {
-    const elements = bubbles.map((bubble, i) =>
+  const bubbleEle = (list: BubbleType[]) => {
+    const elements = list.map((bubble, i) =>
       <Bubble
         key={i}
-        loading={bubble.loading}
-        placement={bubble.role === 'ai' ? 'start' : 'end'}
+        placement={bubble.role === 'assistant' ? 'start' : 'end'}
         content={bubble.content}
         messageRender={renderMarkdown}
-        avatar={{ icon: bubble.role === 'ai' ? <RobotOutlined /> : <UserOutlined />, style: { background: bubble.role === 'ai' ? '#fde3cf' : '#87d068' } }}
-        style={{ marginBottom: '10px', }}
+        header={<p className={'text-xs'}>{timestampToLocal(bubble.created as number)}</p>}
+        footer={<div className='text-gray-500 text-xs'><Button type='link' size="small"><CopyOutlined onClick={() => copyContent(bubble.content as string)} /></Button></div>}
+        avatar={{ icon: bubble.role === 'assistant' ? <RobotOutlined /> : <UserOutlined />, style: { background: bubble.role === 'assistant' ? '#fde3cf' : '#87d068' } }}
+        style={{ marginBottom: '5px', }}
       />
     );
 
@@ -99,20 +120,25 @@ const Chat = ({ agent }) => {
 
   return (
     <div className='w-full h-full relative'>
-      <Title text={`桌面助手${agent}`} />
-      {bubbles.length ?
-        <div
-          ref={messageRef}
-          className='m-4 rounded-sm p-2 overflow-y-auto'
-          style={{ maxHeight: '80%' }}
-        >{bubbleEle()}</div> : <div className='w-3/5 m-auto my-2'>
+      <Title text={`桌面助手`} />
+      <div
+        ref={messageRef}
+        className='m-4 rounded-sm p-2 overflow-y-auto'
+        style={{ maxHeight: '80%' }}
+      >
+        {bubbleEle(bubbles)}
+        {bubbleEle(streamBubble)}
+      </div>
+      {bubbles.length === 0 ?
+        <div className='w-3/5 m-auto my-2'>
           <Welcome
-            icon={<img src={welcomePng}/>}
+            icon={<img src={welcomePng} />}
             title="你好"
             description="欢迎开启美好的一天，希望能帮助你"
           />
-        </div>
+        </div> : ''
       }
+
       <div
         className='w-full absolute bottom-0'
       >
@@ -120,8 +146,8 @@ const Chat = ({ agent }) => {
           className='w-4/5 m-auto'
           style={{ maxWidth: '500px', maxHeight: '100px' }}
           value={content}
+          loading={senderLoading}
           allowSpeech
-          loading={bubbles[bubbles.length - 1]?.loading}
           onChange={setContent}
           onSubmit={(nextContent) => {
             afterInput(nextContent);

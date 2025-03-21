@@ -16,13 +16,15 @@ const App: React.FC = () => {
   const [value, setValue] = useState<boolean>(true)
   document.documentElement.setAttribute('data-theme', value ? 'light' : 'dark')
   useEffect(() => {
-    getAgent().then((res: { data: AgentData }) => {
-      console.log('当前Agent名字：' + res.data.main)
-      setAgent(res.data.main)
-      getAgentMode(res.data.main).then((modes: { data: ModeData }) => {
-        setMode(modes.data.current)
-        if (modes.data.all_modes) {
-          setModeList([...modes.data.all_modes])
+    getAgent().then(({ data }) => {
+      console.log('当前Agent名字：' + data.main)
+      const main = data.main
+      // const main = 'coco_sim'
+      setAgent(main)
+      getAgentMode(main).then(({data:modes}) => {
+        setMode(modes.current)
+        if (modes.all_modes) {
+          setModeList([...modes.all_modes])
         }
       })
     })

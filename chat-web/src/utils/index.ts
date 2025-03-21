@@ -1,5 +1,6 @@
 // 时间转换
 export const timestampToLocal = (timestamp: number) => {
+  if(!timestamp) return ''
   // 处理秒级时间戳（10位）
   const date = new Date(timestamp * 1000);
 

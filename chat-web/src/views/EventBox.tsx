@@ -1,4 +1,4 @@
-import { Button, Collapse,Typography } from 'antd';
+import { Collapse,Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import {
   UserOutlined,
@@ -34,16 +34,16 @@ const EventBox = ({ agent = 'simple-chat' }) => {
   //   console.log(key);
   // };
   const getList = ()=>{
-    getAgentMessage(agent).then(res => {
-      const list = res.data.messages.reverse().map(
+    getAgentMessage(agent).then(({data})=> {
+      const list = data.messages.reverse().map(
         (msg: MessageData) => (
           {
             key: msg.msg_id,
             type: msg.type,
-            label: <p className={'ellipsis-text'}>
+            label: (<p className={'ellipsis-text'}>
               {msg.role === `user` ? <UserOutlined className={'mr-1'} /> : <RobotOutlined className={'mr-1'} />} 
               {msg.content}
-            </p>,
+            </p>),
             content: msg.content,
             role: msg.role,
             name: msg.name,

@@ -1,26 +1,35 @@
-import { Conversations, type ConversationsProps } from '@ant-design/x';
-import { Select, Button, Modal, Input } from 'antd';
+import { Select, Button, Modal, Input, message } from 'antd';
 import { useState } from 'react';
 import { RobotOutlined } from '@ant-design/icons'
 import Title from '../components/Title'
 import { Mode } from './../props'
+import { agentSwitchMode } from './../http'
+import avatar from './../assets/avatar.png'
 import './RobotInfo.css'
 
 const RobotInfo = ({ agent = '', modes = [] }) => {
+  const [messageApi, contextHolder] = message.useMessage();
   const [option, setOption] = useState<string>('simple-chat');
   const [ip, setIp] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleChange = (value: string) => {
-    console.log(value);
-    setOption(value)
+  const handleChange = (option: { value: string; label: React.ReactNode }) => {
+    agentSwitchMode(agent, option.value).then(({ data }) => {
+      if (data.ok) {
+        setOption(option.value)
+        messageApi.success('切换成功')
+      } else {
+        messageApi.warning('切换失败')
+      }
+    })
+
   };
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
-    if(ip){
+    if (ip) {
       setIsModalOpen(false);
       setIp(ip)
     }
@@ -34,22 +43,23 @@ const RobotInfo = ({ agent = '', modes = [] }) => {
     return (
       <Modal title="请输入机器人的IP" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
         <div className='flex'>
-          <Input onChange={(e)=>setIp(e.target.value)} />
+          <Input onChange={(e) => setIp(e.target.value)} />
         </div>
       </Modal>
     )
   }
   return (
     <div className='robot-info text-base'>
+      {contextHolder}
       <Title text={"机器人信息"} />
       <div className='avatar flex mx-2 my-4'>
-        <div className='w-12 h-12 rounded-full text-center bg-gray-300 text-2xl leading-12'>
-          <RobotOutlined />
+        <div className='w-12 h-12 rounded-full text-center  text-2xl leading-12'>
+          <img src={avatar}/>
         </div>
         <div className='ml-2'>
-          <p className='text-base leading-6'>Hi, 你好</p>
+          <p className='text-base leading-6'>Hi, 你好 {option}</p>
           {ip ?
-            <p className='text-sm leading-6'>IP: {ip} <Button type='link' size="small" onClick={()=>setIp('')}>断开</Button></p> 
+            <p className='text-sm leading-6'>IP: {ip} <Button type='link' size="small" onClick={() => setIp('')}>断开</Button></p>
             :
             <Button type="primary" size="small" onClick={showModal}>连接</Button>
           }
@@ -64,7 +74,7 @@ const RobotInfo = ({ agent = '', modes = [] }) => {
           size='small'
           onChange={handleChange}
           options={modes?.map((mode: Mode) => {
-            return { label: mode.name, value: mode.id }
+            return { label: mode.name, value: mode.id } 
           })}
         />
       </div>

@@ -14,17 +14,15 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         proxy: {
-            '/api': {
-                target: 'http://10.168.1.117:20770',
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, '')
-            },
             '/service': {
-                target: 'http://10.168.1.117:20771',
+                target: 'http://192.168.1.248:30770',
                 changeOrigin: true,
+                bypass(req, res, options) {
+                    const proxyURL = options.target + options.rewrite(req.url);
+                    res.setHeader('x-req-proxyURL', proxyURL) // 将真实请求地址设置到响应头中
+                  },
                 rewrite: (path) => path.replace(/^\/service/, '')
             }
         }
     },
-
 })
