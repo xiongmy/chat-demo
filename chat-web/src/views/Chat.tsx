@@ -1,13 +1,12 @@
-import { RobotOutlined, UserOutlined, CopyOutlined } from '@ant-design/icons';
+import { RobotOutlined, UserOutlined, CopyOutlined, ClearOutlined } from '@ant-design/icons';
 import { Bubble, Sender, Welcome } from '@ant-design/x';
 import type { BubbleProps } from '@ant-design/x';
-import { Button } from 'antd'
+import { Button, Card } from 'antd'
 import { useState, useRef, useEffect } from 'react';
 import markdownit from 'markdown-it';
-import Title from './../components/Title';
 import { BubbleType } from './../props'
 import { timestampToLocal } from './../utils'
-import { sendMessage, pullMessageId, getAgentMessage, BASE_URL, interruptMessage } from './../http'
+import { sendMessage, pullMessageId, getAgentMessage, BASE_URL, interruptMessage, clearAgentMessage } from './../http'
 import './Chat.css'
 import welcomePng from './../assets/welcome.png'
 
@@ -93,7 +92,11 @@ const Chat = ({ agent = 'coco' }) => {
       setBubbles(bubbles => [...bubbles, ...list])
     }
   }
-
+  const clearMessages = () => {
+    clearAgentMessage(agent).then(()=>{
+      updateBubbles()
+    })
+  }
   const copyContent = (text: string) => {
     console.log(text)
   }
@@ -120,7 +123,14 @@ const Chat = ({ agent = 'coco' }) => {
 
   return (
     <div className='w-full h-full relative'>
-      <Title text={`桌面助手`} />
+      <div className="w-full h-8 leading-8 pl-2 border-b-1 border-b-1 border-gray-300 text-base bg-gray-100">
+        <div className='flex justify-between'>
+          <p>AI会话</p>
+          <div>
+            <Button type='primary' size='small' onClick={()=>clearMessages()}><ClearOutlined />清空会话</Button>
+          </div>
+        </div>
+      </div>
       <div
         ref={messageRef}
         className='m-4 rounded-sm p-2 overflow-y-auto'

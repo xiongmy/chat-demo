@@ -16,6 +16,18 @@ export const getAgentMode = (agent: string) => {
 export const getAgentMessage = (agent: string) => {
   return axios.get(`${BASE_URL}/agents/${agent}/messages`)
 }
+
+export const clearAgentMessage = async (agent: string) => {
+  const event = {
+    messages: []
+  };
+  return fetch(`${BASE_URL}/agents/${agent}/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event })
+  });
+}
+
 // agent切换模式
 export const agentSwitchMode = (agent: string, mode: string) => {
   return axios.put(`${BASE_URL}/agents/${agent}/switch`, { mode })
@@ -42,7 +54,7 @@ export const sendMessage = async (content: string, userId = DEFAULT_USER_ID) => 
 }
 
 // 中断消息
-export const interruptMessage = async (agent:string) => {
+export const interruptMessage = async (agent: string) => {
   const event = {
     id: `evt_interrupt_${Date.now()}`,  // 事件唯一标识符，格式为 "evt_" 加上毫秒级时间戳
     agent_id: agent,       // 接收消息的代理ID

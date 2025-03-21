@@ -11,22 +11,14 @@ import { Agent, AgentData, ModeData, ModeListData } from '@/props'
 
 const App: React.FC = () => {
   const [agent, setAgent] = useState('coco')
-  const [mode, setMode] = useState('simple_chat')
-  const [modeList, setModeList] = useState<ModeListData[]>([])
   const [value, setValue] = useState<boolean>(true)
   document.documentElement.setAttribute('data-theme', value ? 'light' : 'dark')
   useEffect(() => {
     getAgent().then(({ data }) => {
       console.log('当前Agent名字：' + data.main)
+      console.log(data)
       const main = data.main
-      // const main = 'coco_sim'
       setAgent(main)
-      getAgentMode(main).then(({data:modes}) => {
-        setMode(modes.current)
-        if (modes.all_modes) {
-          setModeList([...modes.all_modes])
-        }
-      })
     })
   }, []);
   return (
@@ -38,7 +30,7 @@ const App: React.FC = () => {
     >
       <div className='w-full h-full flex'>
         <div className='color-set w-1/4'>
-          <RobotInfo agent={agent} modes={modeList} />
+          <RobotInfo agent={agent} />
         </div>
         <div className='color-set chat w-2/4'>
           <Chat agent={agent} />

@@ -1,17 +1,27 @@
 import { Select, Button, Modal, Input, message } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { RobotOutlined } from '@ant-design/icons'
 import Title from '../components/Title'
-import { Mode } from './../props'
-import { agentSwitchMode } from './../http'
+import { Mode, ModeData } from './../props'
+import { agentSwitchMode, getAgentMode } from './../http'
 import avatar from './../assets/avatar.png'
 import './RobotInfo.css'
 
-const RobotInfo = ({ agent = '', modes = [] }) => {
+const RobotInfo = ({ agent = ''}) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [option, setOption] = useState<string>('simple-chat');
   const [ip, setIp] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modeList, setModeList] = useState<ModeData[]>([])
+  
+
+  useEffect(()=>{
+    getAgentMode(agent).then(({data:modes}) => {
+      if (modes.all_modes) {
+        setModeList([...modes.all_modes])
+      }
+    })
+  },[])
 
   const handleChange = (option: { value: string; label: React.ReactNode }) => {
     agentSwitchMode(agent, option.value).then(({ data }) => {
@@ -73,7 +83,7 @@ const RobotInfo = ({ agent = '', modes = [] }) => {
           defaultValue={option}
           size='small'
           onChange={handleChange}
-          options={modes?.map((mode: Mode) => {
+          options={modeList?.map((mode: Mode) => {
             return { label: mode.name, value: mode.id } 
           })}
         />
