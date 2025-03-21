@@ -1,27 +1,28 @@
-import { Select, Button, Modal, Input, message } from 'antd';
+import { Select, Button, Modal, Input, message, Popover } from 'antd';
 import { useEffect, useState } from 'react';
-import { RobotOutlined } from '@ant-design/icons'
+import { InfoCircleOutlined } from '@ant-design/icons'
 import Title from '../components/Title'
 import { Mode, ModeData } from './../props'
 import { agentSwitchMode, getAgentMode } from './../http'
 import avatar from './../assets/avatar.png'
 import './RobotInfo.css'
 
-const RobotInfo = ({ agent = ''}) => {
+const RobotInfo = ({ agent = '' }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [option, setOption] = useState<string>('simple-chat');
   const [ip, setIp] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modeList, setModeList] = useState<ModeData[]>([])
-  
+  const [info, setInfo] = useState('')
 
-  useEffect(()=>{
-    getAgentMode(agent).then(({data:modes}) => {
+  useEffect(() => {
+    getAgentMode(agent).then(({ data, data: modes }) => {
+      setInfo(JSON.stringify(data))
       if (modes.all_modes) {
         setModeList([...modes.all_modes])
       }
     })
-  },[])
+  }, [])
 
   const handleChange = (option: { value: string; label: React.ReactNode }) => {
     agentSwitchMode(agent, option.value).then(({ data }) => {
@@ -64,10 +65,13 @@ const RobotInfo = ({ agent = ''}) => {
       <Title text={"机器人信息"} />
       <div className='avatar flex mx-2 my-4'>
         <div className='w-12 h-12 rounded-full text-center  text-2xl leading-12'>
-          <img src={avatar}/>
+          <img src={avatar} />
         </div>
         <div className='ml-2'>
-          <p className='text-base leading-6'>Hi, 你好 {option}</p>
+          <p className='text-base leading-6'>Hi, 你好 {option}
+            <Popover style={{width:'100px'}} content={info} title="Title">
+              <Button type='link' size='small'><InfoCircleOutlined /></Button>
+            </Popover></p>
           {ip ?
             <p className='text-sm leading-6'>IP: {ip} <Button type='link' size="small" onClick={() => setIp('')}>断开</Button></p>
             :
@@ -84,7 +88,7 @@ const RobotInfo = ({ agent = ''}) => {
           size='small'
           onChange={handleChange}
           options={modeList?.map((mode: Mode) => {
-            return { label: mode.name, value: mode.id } 
+            return { label: mode.name, value: mode.id }
           })}
         />
       </div>
