@@ -1,7 +1,7 @@
 import { RobotOutlined, UserOutlined, CopyOutlined, ClearOutlined } from '@ant-design/icons';
 import { Bubble, Sender, Welcome } from '@ant-design/x';
 import type { BubbleProps } from '@ant-design/x';
-import { Button, Card } from 'antd'
+import { Button,message } from 'antd'
 import { useState, useRef, useEffect } from 'react';
 import markdownit from 'markdown-it';
 import { BubbleType } from './../props'
@@ -23,6 +23,8 @@ const Chat = ({ agent = 'coco' }) => {
   const [streamBubble, setStreamBubble] = useState<BubbleType[]>([])
   const messageRef = useRef<HTMLInputElement>(null)
   const [senderLoading, setSenderLoading] = useState(false)
+  const [messageApi, contextHolder] = message.useMessage();
+  const [showWelcome, setShowWelcome] = useState(true)
 
   useEffect(() => {
     const timer = setInterval(() => { receiveMsg() }, 1000)
@@ -38,6 +40,7 @@ const Chat = ({ agent = 'coco' }) => {
   }, [bubbles, streamBubble])
   const updateBubbles = async () => {
     const { data } = await getAgentMessage(agent)
+    if(data.messages.length) setShowWelcome(false)
     const list = data.messages.map(msg => { return { role: msg.role, content: msg.content, msgId: msg.msg_id, created: msg.created } })
     setBubbles([...list])
   }
@@ -82,25 +85,51 @@ const Chat = ({ agent = 'coco' }) => {
             fullContent += data.chunk.content; // 消息文本内容
           }
 
-          // console.log("收到部分回复:", data.chunk.content);
           setStreamBubble([{ role: data.chunk.role, content: fullContent, id: data.chunk.msg_id, created }])
         }
       }
       console.log("完整回复:", fullContent);
       setStreamBubble([])
-      const list = [...streamBubble, { role: msgRole, content: fullContent, id: msgId, }]
+      const list = [...streamBubble, { role: msgRole, content: fullContent, id: msgId, created }]
       setBubbles(bubbles => [...bubbles, ...list])
     }
   }
   const clearMessages = () => {
-    clearAgentMessage(agent).then(()=>{
+    clearAgentMessage(agent).then(() => {
+      messageApi.info('已清空')
       updateBubbles()
     })
   }
   const copyContent = (text: string) => {
-    console.log(text)
+    if ('clipboard' in navigator) {
+      // clipboard API可用
+      navigator.clipboard.writeText(text).then(
+        () => {
+          messageApi.success('复制成功')
+        },
+        err => {
+          messageApi.error('Failed to copy text: ', err)
+        }
+      )
+    } else {
+      // 剪贴板API不可用
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        messageApi.success('复制成功')
+      } catch (err) {
+        messageApi.error('Failed to copy text: ', err);
+      }
+      document.body.removeChild(textarea);
+    }
+
   }
   const afterInput = (msg: string) => {
+    if(showWelcome) setShowWelcome(false)
     setContent('')
     sendMsg(msg)
   }
@@ -123,11 +152,12 @@ const Chat = ({ agent = 'coco' }) => {
 
   return (
     <div className='w-full h-full relative'>
+      {contextHolder}
       <div className="w-full h-8 leading-8 pl-2 border-b-1 border-b-1 border-gray-300 text-base bg-gray-100">
         <div className='flex justify-between'>
           <p>AI会话</p>
           <div>
-            <Button type='primary' size='small' onClick={()=>clearMessages()}><ClearOutlined />清空会话</Button>
+            <Button type='primary' size='small' onClick={() => clearMessages()}><ClearOutlined />清空</Button>
           </div>
         </div>
       </div>
@@ -139,7 +169,7 @@ const Chat = ({ agent = 'coco' }) => {
         {bubbleEle(bubbles)}
         {bubbleEle(streamBubble)}
       </div>
-      {bubbles.length === 0 ?
+      {showWelcome?
         <div className='w-3/5 m-auto my-2'>
           <Welcome
             icon={<img src={welcomePng} />}

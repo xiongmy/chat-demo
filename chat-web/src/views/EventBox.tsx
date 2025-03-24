@@ -56,7 +56,7 @@ const EventBox = ({ agent = 'simple-chat' }) => {
   }
   return (
     <div className='message-box relative'>
-      <Title text={`消息列表`} />
+      <Title text={`事件列表`} />
       <div className='absolute top-1 right-20 cursor-pointer text-blue-500' onClick={getList}><ReloadOutlined className='text-xl' /></div>
       <div className='message-list relative'>
         <Collapse items={messages} defaultActiveKey={['1']}  />
