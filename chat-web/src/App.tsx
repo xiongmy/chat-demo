@@ -1,13 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
-import Chat from '@/views/Chat.tsx'
-import EventBox from '@/views/EventBox.tsx'
-import RobotInfo from '@/views/RobotInfo.tsx'
-import { Switch, ConfigProvider,theme } from 'antd'
+import { Switch, ConfigProvider, theme } from 'antd'
 import { SunOutlined, MoonOutlined } from '@ant-design/icons'
 import '@/App.css'
-import { getAgent, getAgentMode } from './http'
-import { Agent, AgentData, ModeData, ModeListData } from '@/props'
+import Chat from './views/Chat.tsx'
+import AgentInfo from '@/views/AgentInfo';
+import RobotInfo from '@/views/RobotInfo.tsx'
+import { getAgent } from '@/http'
+// import { Agent, AgentData, ModeData, ModeListData } from '@/props'
+// import EventBox from '@/views/EventBox.tsx'
 
 const App: React.FC = () => {
   const [agent, setAgent] = useState('coco')
@@ -25,18 +26,19 @@ const App: React.FC = () => {
     <ConfigProvider
       theme={{
         // 1. 单独使用暗色算法
-        algorithm: value? theme.defaultAlgorithm: theme.darkAlgorithm,
+        algorithm: value ? theme.defaultAlgorithm : theme.darkAlgorithm,
       }}
     >
       <div className='w-full h-full flex'>
-        <div className='color-set w-1/4'>
+        <div className='color-set w-1/5'>
           <RobotInfo agent={agent} />
         </div>
-        <div className='color-set chat w-2/4'>
-          <Chat agent={agent} />
+        <div className='color-set chat w-2/5'>
+          {/* <EventBox agent={agent} /> */}
+          <AgentInfo />
         </div>
-        <div className='w-1/4 color-set'>
-          <EventBox agent={agent} />
+        <div className='w-2/5 color-set'>
+          <Chat agent={agent} />
         </div>
         <div className='fixed top-0 right-4'>
           <Switch

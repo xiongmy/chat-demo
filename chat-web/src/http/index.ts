@@ -4,19 +4,25 @@ import axios from 'axios'
 const AGENT_ID = "coco";
 export const BASE_URL = '/service'
 const AGENT_HUB_URL = "/service";
-const DEFAULT_USER_ID = '9nine999-9999-9999-9999-999999999999'
+const DEFAULT_USER_ID = '9test999-9999-9999-9999-777777777777' // 10
+// const DEFAULT_USER_ID = '9test888-9999-9999-9999-777777777777' // 1
+
+// 获取agent
 export const getAgent = () => {
   return axios.get(`${BASE_URL}/agents`)
 }
 
+// 获取agent的mode
 export const getAgentMode = (agent: string) => {
   return axios.get(`${BASE_URL}/agents/${agent}`)
 }
 
+// 获取agent 历史消息
 export const getAgentMessage = (agent: string) => {
   return axios.get(`${BASE_URL}/agents/${agent}/messages`)
 }
 
+// 清空agent历史消息
 export const clearAgentMessage = async (agent: string) => {
   const event = {
     messages: []
@@ -33,7 +39,7 @@ export const agentSwitchMode = (agent: string, mode: string) => {
   return axios.put(`${BASE_URL}/agents/${agent}/switch`, { mode })
 }
 
-// 发送消息
+// 发送消息(AI会话)
 export const sendMessage = async (content: string, userId = DEFAULT_USER_ID) => {
   const event = {
     id: `evt_${Date.now()}`,  // 事件唯一标识符，格式为 "evt_" 加上毫秒级时间戳
@@ -41,7 +47,7 @@ export const sendMessage = async (content: string, userId = DEFAULT_USER_ID) => 
     event_type: "user_input", // 事件类型，用户输入固定为 "user_input"
     data: {
       content,
-      user_id: userId,
+      user_id: DEFAULT_USER_ID,
     },
     timestamp: new Date().toISOString() // ISO格式的时间戳
   };
@@ -69,6 +75,7 @@ export const interruptMessage = async (agent: string) => {
     body: JSON.stringify({ event })
   });
 }
+
 // 轮询新消息ID
 export const pullMessageId = async () => {
   const response = await fetch(`${BASE_URL}/messages/agents/${AGENT_ID}/pop`, {
@@ -107,4 +114,14 @@ export const getMessageContent = async (msgId: string) => {
   }
 
   return fullContent;
+}
+
+
+// 获取机器人硬件Schema
+export const getRobotSchema = () => {
+  return axios.get(`${BASE_URL}/body/status/schema`)
+}
+// 获取机器人硬件状态
+export const getRobotData = () => {
+  return axios.get(`${BASE_URL}/body/status`)
 }

@@ -1,8 +1,8 @@
+import { useState, useRef, useEffect } from 'react';
 import { RobotOutlined, UserOutlined, CopyOutlined, ClearOutlined } from '@ant-design/icons';
 import { Bubble, Sender, Welcome } from '@ant-design/x';
 import type { BubbleProps } from '@ant-design/x';
-import { Button,message } from 'antd'
-import { useState, useRef, useEffect } from 'react';
+import { Button, message } from 'antd'
 import markdownit from 'markdown-it';
 import { BubbleType } from './../props'
 import { timestampToLocal } from './../utils'
@@ -40,7 +40,7 @@ const Chat = ({ agent = 'coco' }) => {
   }, [bubbles, streamBubble])
   const updateBubbles = async () => {
     const { data } = await getAgentMessage(agent)
-    if(data.messages.length) setShowWelcome(false)
+    if (data.messages.length) setShowWelcome(false)
     const list = data.messages.map(msg => { return { role: msg.role, content: msg.content, msgId: msg.msg_id, created: msg.created } })
     setBubbles([...list])
   }
@@ -62,6 +62,7 @@ const Chat = ({ agent = 'coco' }) => {
     msgId = await pullMessageId();
     let msgRole = ''
     if (msgId) {
+      console.log(msgId)
       // 3. 获取消息内容
       let fullContent = "";
       let done = false;
@@ -74,11 +75,11 @@ const Chat = ({ agent = 'coco' }) => {
         });
 
         const data = await response.json();
-        done = data.done; // 是否已获取完所有消息块，true表示已完成
-
+        
         if (data.chunk) {
           msgRole = data.chunk.role
           if (data.chunk.seq === 'complete') {
+            done = true
             fullContent = data.chunk.content; // 消息文本内容
             created = data.chunk.created
           } else {
@@ -88,7 +89,7 @@ const Chat = ({ agent = 'coco' }) => {
           setStreamBubble([{ role: data.chunk.role, content: fullContent, id: data.chunk.msg_id, created }])
         }
       }
-      console.log("完整回复:", fullContent);
+      // console.log("完整回复:", fullContent);
       setStreamBubble([])
       const list = [...streamBubble, { role: msgRole, content: fullContent, id: msgId, created }]
       setBubbles(bubbles => [...bubbles, ...list])
@@ -129,7 +130,7 @@ const Chat = ({ agent = 'coco' }) => {
 
   }
   const afterInput = (msg: string) => {
-    if(showWelcome) setShowWelcome(false)
+    if (showWelcome) setShowWelcome(false)
     setContent('')
     sendMsg(msg)
   }
@@ -153,23 +154,23 @@ const Chat = ({ agent = 'coco' }) => {
   return (
     <div className='w-full h-full relative'>
       {contextHolder}
-      <div className="w-full h-8 leading-8 pl-2 border-b-1 border-b-1 border-gray-300 text-base bg-gray-100">
-        <div className='flex justify-between'>
+      <div className="w-full h-8 leading-8 pl-2 border-b-1 border-b-1 border-gray-300 text-base color-set">
+        <div className='flex '>
           <p>AI会话</p>
-          <div>
+          <div className='ml-4'>
             <Button type='primary' size='small' onClick={() => clearMessages()}><ClearOutlined />清空</Button>
           </div>
         </div>
       </div>
       <div
         ref={messageRef}
-        className='m-4 rounded-sm p-2 overflow-y-auto'
+        className='m-2 rounded-sm p-2 overflow-y-auto overflow-x-hidden'
         style={{ maxHeight: '80%' }}
       >
         {bubbleEle(bubbles)}
         {bubbleEle(streamBubble)}
       </div>
-      {showWelcome?
+      {showWelcome ?
         <div className='w-3/5 m-auto my-2'>
           <Welcome
             icon={<img src={welcomePng} />}
@@ -183,8 +184,7 @@ const Chat = ({ agent = 'coco' }) => {
         className='w-full absolute bottom-0'
       >
         <Sender
-          className='w-4/5 m-auto'
-          style={{ maxWidth: '500px', maxHeight: '100px' }}
+          style={{ width:'80%', margin:'0 10%', maxWidth: '500px', maxHeight: '100px' }}
           value={content}
           loading={senderLoading}
           allowSpeech

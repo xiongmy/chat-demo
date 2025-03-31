@@ -24,14 +24,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.jsx"],
   /* 新增配置部分 - 识别路径别名 */
   "baseUrl": "./",
   "paths": {
     "@/*": [
       "src/*"
-    ]
+    ],
   }
 }
