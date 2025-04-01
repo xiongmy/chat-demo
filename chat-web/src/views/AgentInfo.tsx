@@ -50,9 +50,9 @@ const AgentInfo = ({ agent = "" }) => {
           </div>
         </div>
       </div>
-      <div>
+      <div className="m-4">
         <p>agentinfo</p>
-        {info}
+        <p>{info}</p>
       </div>
     </div>
   );

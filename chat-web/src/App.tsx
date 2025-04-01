@@ -31,7 +31,7 @@ const App: React.FC = () => {
     >
       <div className='w-full h-full flex'>
         <div className='color-set w-1/5'>
-          <RobotInfo agent={agent} />
+          <RobotInfo agent={agent} themeMode={value} />
         </div>
         <div className='color-set chat w-2/5'>
           {/* <EventBox agent={agent} /> */}

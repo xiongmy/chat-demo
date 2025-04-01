@@ -1,7 +1,6 @@
-import { Modal, Input, message, Button, Collapse } from "antd";
+import { Modal, Input, message, Button, Collapse, theme } from "antd";
 import { useEffect, useState } from "react";
-// import { InfoCircleOutlined } from "@ant-design/icons";
-import type { CollapseProps } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
 import Title from "../components/Title";
 import { Mode, ModeData } from "./../props";
 import { getRobotSchema, getRobotData } from "./../http";
@@ -17,7 +16,7 @@ interface RobotInfoType {
     label: string;
   }[];
 }
-const RobotInfo = ({ agent = "" }) => {
+const RobotInfo = ({ agent = "", themeMode = "" }) => {
   const [ip, setIp] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [robotData, setRobotData] = useState({});
@@ -29,13 +28,16 @@ const RobotInfo = ({ agent = "" }) => {
       console.log(data);
       setRobotSchema(data.schema);
     });
+    getRobotStatus()
+    
+  }, []);
+  const getRobotStatus = ()=>{
     getRobotData().then(({ data }) => {
       console.log(data);
       setRobotData(data.state);
       form.setValues(data.state);
     });
-  }, []);
-
+  }
   // const showModal = () => {
   //   setIsModalOpen(true);
   // };
@@ -65,8 +67,7 @@ const RobotInfo = ({ agent = "" }) => {
       </Modal>
     );
   };
-  
-  
+
   return (
     <div className="robot-info text-base">
       <Title text={"机器人信息"} />
@@ -98,13 +99,20 @@ const RobotInfo = ({ agent = "" }) => {
         <UserManage agent={agent} />
       </div>
       <div className="m-2 device-list">
-        <p className="h-8 leading-8 text-base">配件列表</p>
+        <p className="h-8 leading-8 text-base">配件列表 <Button type="link" onClick={getRobotStatus}><ReloadOutlined/></Button></p>
         <FormRender
-        className="w-full"
+          className="w-full"
           readOnly={true}
           form={form}
           schema={robotSchema}
           displayType="inline"
+          configProvider={{
+            theme: {
+              algorithm: themeMode
+                ? theme.defaultAlgorithm
+                : theme.darkAlgorithm,
+            },
+          }}
         />
         <p className="mt-2 h-8 leading-8 text-base">技能列表</p>
         <ul className="leading-6 ml-4 text-sm">
