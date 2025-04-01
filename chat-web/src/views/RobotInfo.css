@@ -39,3 +39,6 @@
 .device-list .fr-obj-collapse .ant-collapse-content-box, .device-list .fr-obj-collapse .ant-collapse-header{
   padding: 2px 0 2px 10px !important;
 }
+.device-list .collapse-title{
+  font-size: 14px;
+}
