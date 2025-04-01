@@ -1,23 +1,59 @@
-import { Collapse,Typography } from 'antd';
-import { useEffect, useState } from 'react';
-import {
-  UserOutlined,
-  RobotOutlined,
-  ReloadOutlined
-} from '@ant-design/icons';
-import type { BubbleProps } from '@ant-design/x';
-import Title from '@/components/Title'
-import { getAgentMessage } from "../http"
-import markdownit from 'markdown-it';
+import { Button, Select, message } from "antd";
+import { useEffect, useState } from "react";
+import {} from "@ant-design/icons";
+import { agentSwitchMode, getAgentMode } from "../http";
+import { Mode, ModeData } from "./../props";
 
+const AgentInfo = ({ agent = "" }) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [modeList, setModeList] = useState<ModeData[]>([]);
+  const [info, setInfo] = useState("");
+  const [currentMode, setCurrentMode] = useState<string>("simple-chat");
 
-const AgentInfo = ({ agent = 'simple-chat' }) => {
-  const [messages, setMessages] = useState<MessageData[]>([])
-  
+  const handleChange = (option: { value: string; label: React.ReactNode }) => {
+    agentSwitchMode(agent, option.value).then(({ data }) => {
+      if (data.ok) {
+        setCurrentMode(option.value);
+        messageApi.success("切换成功");
+      } else {
+        messageApi.warning("切换失败");
+      }
+    });
+  };
+  useEffect(() => {
+    getAgentMode(agent).then(({ data, data: modes }) => {
+      setInfo(JSON.stringify(data));
+      if (modes.all_modes) {
+        setModeList([...modes.all_modes]);
+      }
+    });
+  }, []);
   return (
-    <div className='agent-info'>
-      <p>agentinfo</p>
-      
+    <div className="agent-info">
+      {contextHolder}
+      <div className="w-full h-8 leading-8 pl-2 border-b-1 border-b-1 border-gray-300 text-base color-set">
+        <div className="flex ">
+          <div>
+            <Button type="link">Agent : {agent}</Button>
+          </div>
+          <div className="ml-2">
+            <span className="text-sm"> 选择模式：</span>
+            <Select
+              labelInValue
+              defaultValue={currentMode}
+              size="small"
+              onChange={handleChange}
+              options={modeList?.map((mode: Mode) => {
+                return { label: mode.name, value: mode.id };
+              })}
+            />
+          </div>
+        </div>
+      </div>
+      <div>
+        <p>agentinfo</p>
+        {info}
+      </div>
     </div>
   );
 };

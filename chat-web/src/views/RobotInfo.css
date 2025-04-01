@@ -18,3 +18,24 @@
   border-radius: 10px;
   overflow: hidden;
 }
+.device-list{
+  max-height: calc(100vh - 340px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.device-list .ant-collapse{
+  width: 100%;
+  margin: 0;
+  /* padding: 0; */
+  
+}
+.device-list .ant-collapse-item .ant-collapse-header, .device-list .ant-collapse-item .ant-collapse-content{
+  margin: 0;
+  padding: 0;
+}
+.device-list .fr-desc {
+  display: none;
+}
+.device-list .fr-obj-collapse .ant-collapse-content-box, .device-list .fr-obj-collapse .ant-collapse-header{
+  padding: 4px 0 0 10px !important;
+}

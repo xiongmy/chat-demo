@@ -35,7 +35,7 @@ const App: React.FC = () => {
         </div>
         <div className='color-set chat w-2/5'>
           {/* <EventBox agent={agent} /> */}
-          <AgentInfo />
+          <AgentInfo agent={agent} />
         </div>
         <div className='w-2/5 color-set'>
           <Chat agent={agent} />
