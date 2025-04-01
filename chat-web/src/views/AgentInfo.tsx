@@ -1,8 +1,10 @@
-import { Button, Select, message } from "antd";
+import { Button, Select, message, Input } from "antd";
 import { useEffect, useState } from "react";
 import {} from "@ant-design/icons";
 import { agentSwitchMode, getAgentMode } from "../http";
 import { Mode, ModeData } from "./../props";
+import * as monaco from "monaco-editor";
+import "./AgentInfo.css";
 
 const AgentInfo = ({ agent = "" }) => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -26,6 +28,10 @@ const AgentInfo = ({ agent = "" }) => {
       if (modes.all_modes) {
         setModeList([...modes.all_modes]);
       }
+      monaco.editor.create(document.getElementById("container"), {
+        value: JSON.stringify(data, null, 2),
+        language: "javascript",
+      });
     });
   }, []);
   return (
@@ -50,9 +56,8 @@ const AgentInfo = ({ agent = "" }) => {
           </div>
         </div>
       </div>
-      <div className="m-4">
-        <p>agentinfo</p>
-        <p>{info}</p>
+      <div className="code-box mt-4">
+        <div id="container" className="w-full h-full"></div>
       </div>
     </div>
   );
