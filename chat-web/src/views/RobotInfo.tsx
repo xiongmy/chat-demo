@@ -21,6 +21,7 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [robotData, setRobotData] = useState({});
   const [robotSchema, setRobotSchema] = useState({});
+  const [loading, setLoading] = useState(false);
   const form = useForm();
 
   useEffect(() => {
@@ -32,10 +33,12 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
     
   }, []);
   const getRobotStatus = ()=>{
+    setLoading(true)
     getRobotData().then(({ data }) => {
       console.log(data);
       setRobotData(data.state);
       form.setValues(data.state);
+      setLoading(false)
     });
   }
   // const showModal = () => {
@@ -99,7 +102,7 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
         <UserManage agent={agent} />
       </div>
       <div className="m-2 device-list">
-        <p className="h-8 leading-8 text-base">配件列表 <Button type="link" onClick={getRobotStatus}><ReloadOutlined/></Button></p>
+        <p className="h-8 leading-8 text-base">配件列表 <Button type="link" onClick={getRobotStatus} className={loading?'animate-spin':''}><ReloadOutlined size={16} /></Button></p>
         <FormRender
           className="w-full"
           readOnly={true}
