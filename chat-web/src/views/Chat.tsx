@@ -83,7 +83,7 @@ const Chat = ({ agent = "coco" }) => {
     msgId = await pullMessageId();
     let msgRole = "";
     if (msgId) {
-      console.log(msgId);
+      console.log('msgID: ' + msgId);
       // 3. 获取消息内容
       let fullContent = "";
       let done = false;
