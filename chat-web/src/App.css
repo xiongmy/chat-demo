@@ -53,3 +53,12 @@ body{
     -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.3);
     background-color:#ccc;
 }
+
+.ellipsis-text {
+  overflow: hidden;
+  /* 隐藏超出容器的文本 */
+  white-space: nowrap;
+  /* 保持文本在一行内显示 */
+  text-overflow: ellipsis;
+  /* 文本溢出时显示省略号 */
+}

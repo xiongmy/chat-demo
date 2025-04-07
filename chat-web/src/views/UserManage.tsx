@@ -1,21 +1,55 @@
-import { Button, message, Modal, List, Steps, Form, Input, Image } from "antd";
-import { useState } from "react";
+import {
+  Button,
+  message,
+  Modal,
+  List,
+  Steps,
+  Form,
+  Input,
+  Image,
+  Popconfirm,
+} from "antd";
+import { useEffect, useState } from "react";
 import {
   PlusCircleOutlined,
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import {
+  getUserList,
+  createNewUser,
+  getImgRes,
+  exitCreate,
+  delUser,
+} from "./../http/user";
 type FieldType = {
   username?: string;
 };
+interface user {
+  id: string;
+  name: string;
+  image?: string;
+}
 const AgentInfo = ({ agent = "" }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewProgress, setIsNewProgress] = useState(false);
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
+  const [userList, setUserList] = useState<user[]>([]);
+  const [newUser, setNewUser] = useState<user>();
+  useEffect(() => {
+    getList();
+  }, []);
 
   console.log(agent);
+  const getList = () => {
+    getUserList().then((res) => {
+      const list: user[] = res.data.user_list;
+      console.log(res);
+      setUserList([...list]);
+    });
+  };
   const handleOk = () => {
     setIsModalOpen(false);
   };
@@ -25,22 +59,34 @@ const AgentInfo = ({ agent = "" }) => {
   };
   const newUserOk = () => {
     setIsNewProgress(false);
+    getList();
+    resetCreate();
+  };
+  const resetCreate = () => {
+    setStep(0);
+    setName("");
   };
 
   const newUserCancel = () => {
     setIsNewProgress(false);
+    if (step === 1) {
+      // 中断流程
+      exitCreate().then((res) => {
+        console.log(res);
+        resetCreate();
+      });
+    }
   };
-  const userData = [
-    { id: 11111, name: "用户名11111111" },
-    { id: 11112, name: "用户名22222222" },
-    { id: 11113, name: "用户名33333333" },
-    { id: 11114, name: "用户名44444444" },
-    { id: 11115, name: "用户名55555555" },
-    { id: 11116, name: "用户名66666666" },
-    { id: 11117, name: "用户名77777777" },
-    { id: 11118, name: "用户名88888888" },
-    { id: 11119, name: "用户名99999999" },
-  ];
+  const deleteUser = (id: string) => {
+    delUser(id).then((res) => {
+      console.log(res);
+      messageApi.success("删除成功");
+      getList();
+    });
+  };
+  // const editUser = (id: string) => {
+  //   console.log(id);
+  // };
   const stepItems = [
     {
       title: "设置用户名",
@@ -56,12 +102,34 @@ const AgentInfo = ({ agent = "" }) => {
   ];
   const submitName = () => {
     if (name) {
+      let timer: number;
       console.log(name);
-      setStep(1);
+      createNewUser(name).then((res) => {
+        console.log(res);
+        if (res.data.status === "success") {
+          setStep(1);
+          timer = window.setInterval(() => {
+            getImgRes().then((img: any) => {
+              console.log(img.data.status);
+              if (img.data.status === "success") {
+                clearInterval(timer);
+                setStep(2);
+                messageApi.success("新增成功");
+                setNewUser({
+                  id: img.data.user_id,
+                  name: name,
+                  image: img.data.user_image,
+                });
+              }
+            });
+          }, 1000);
+        }
+      });
     }
   };
   return (
     <div className="user-management">
+      {contextHolder}
       <Button
         className="ml-4"
         type="primary"
@@ -79,33 +147,48 @@ const AgentInfo = ({ agent = "" }) => {
                 className="text-lg"
                 onClick={() => setIsNewProgress(true)}
               />
-            </Button>{" "}
+            </Button>
           </p>
         }
-        width={600}
+        width={488}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
+        footer={null}
       >
-        <List
-          className="w-full overflow-y-auto"
-          style={{ height: "300px" }}
-          bordered
-          dataSource={userData}
-          renderItem={(item) => (
-            <List.Item>
-              <p>{item.name}</p>
-              <div>
-                <Button type="link" size="small">
+        <div className="mb-6">
+          <List
+            className="w-full overflow-y-auto"
+            style={{ height: "300px" }}
+            bordered
+            size="small"
+            dataSource={userList}
+            renderItem={(item) => (
+              <List.Item>
+                <p className="w-4/5 ellipsis-text">{item.name}</p>
+                <div>
+                  {/* <Button
+                  type="link"
+                  size="small"
+                  onClick={() => editUser(item.id)}
+                >
                   <EditOutlined style={{ color: "#1677ff" }} />
-                </Button>
-                <Button type="link" size="small">
-                  <DeleteOutlined style={{ color: "red" }} />
-                </Button>
-              </div>
-            </List.Item>
-          )}
-        ></List>
+                </Button> */}
+                  <Popconfirm
+                    title="确认要删除这个用户吗？"
+                    okText="确认"
+                    cancelText="取消"
+                    onConfirm={() => deleteUser(item.id)}
+                  >
+                    <Button type="link" size="small">
+                      <DeleteOutlined style={{ color: "red" }} />
+                    </Button>
+                  </Popconfirm>
+                </div>
+              </List.Item>
+            )}
+          ></List>
+        </div>
       </Modal>
       <Modal
         title="新增用户"
@@ -140,7 +223,7 @@ const AgentInfo = ({ agent = "" }) => {
               </Form.Item>
               <Form.Item label={null}>
                 <Button type="primary" htmlType="submit" onClick={submitName}>
-                  Submit
+                  提交
                 </Button>
               </Form.Item>
             </Form>
@@ -158,22 +241,19 @@ const AgentInfo = ({ agent = "" }) => {
               <p className=" text-gray-600">
                 人脸识别中...请保持人脸在屏幕中央
               </p>
-              <Button className="mt-4" onClick={() => setStep(2)}>
-                已识别成功
-              </Button>
             </div>
           ) : (
             ""
           )}
           {step === 2 ? (
             <div className="text-center">
-              <Image
-                width={100}
-                src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-              />
-              <p className="mt-4">username</p>
+              {newUser?.image ? <Image width={100} src={newUser.image} /> : ""}
+
+              <p className="mt-4">{newUser?.name}</p>
               <div className="mt-4">
-                <Button type="primary">确定</Button>
+                <Button type="primary" onClick={newUserOk}>
+                  确定
+                </Button>
               </div>
             </div>
           ) : (
