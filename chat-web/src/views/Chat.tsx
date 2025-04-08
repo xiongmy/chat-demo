@@ -235,14 +235,11 @@ const Chat = ({ agent = "coco" }) => {
       ) : (
         ""
       )}
-
-      <div className="w-full absolute bottom-0">
+      <div className="w-4/5 absolute bottom-0 bg-white" style={{ left: "10%" }}>
         <Sender
           style={{
-            width: "80%",
-            margin: "0 10%",
             maxWidth: "500px",
-            maxHeight: "100px",
+            margin: "0 auto",
           }}
           value={content}
           loading={senderLoading}

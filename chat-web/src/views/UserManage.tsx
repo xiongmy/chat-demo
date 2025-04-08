@@ -142,9 +142,9 @@ const AgentInfo = ({ agent = "" }) => {
         title={
           <p className="flex h-8 leading-8">
             <span>用户管理</span>
-            <Button type="link">
+            <Button type="link">新增 
               <PlusCircleOutlined
-                className="text-lg"
+                className="text-base"
                 onClick={() => setIsNewProgress(true)}
               />
             </Button>

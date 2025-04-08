@@ -1,5 +1,6 @@
+## 流式输出接口逻辑
 ```
-// const startStream = async (role = 'user', content = '') => {
+  // const startStream = async (role = 'user', content = '') => {
   //   let startTime = new Date().getTime();
   //   const data = {
   //     model: 'deepseek-chat',

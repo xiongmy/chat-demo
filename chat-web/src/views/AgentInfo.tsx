@@ -1,4 +1,4 @@
-import { Button, Select, message, Input } from "antd";
+import { Button, Select, message } from "antd";
 import { useEffect, useState } from "react";
 import {} from "@ant-design/icons";
 import { agentSwitchMode, getAgentMode } from "../http";
