@@ -58,7 +58,7 @@ export const interruptMessage = async (agent: string) => {
   const event = {
     id: `evt_interrupt_${Date.now()}`,  // 事件唯一标识符，格式为 "evt_" 加上毫秒级时间戳
     agent_id: agent,       // 接收消息的代理ID
-    event_type: "interrupt", // 事件类型 
+    event_type: "interrupt", // 事件类型
     data: {},
     timestamp: new Date().toISOString() // ISO格式的时间戳
   };

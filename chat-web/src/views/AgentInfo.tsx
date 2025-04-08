@@ -1,6 +1,6 @@
 import { Button, Select, message } from "antd";
 import { useEffect, useState } from "react";
-import {} from "@ant-design/icons";
+import { SettingFilled } from "@ant-design/icons";
 import { agentSwitchMode, getAgentMode } from "../http";
 import { Mode, ModeData } from "./../props";
 import * as monaco from "monaco-editor";
@@ -9,7 +9,6 @@ import "./AgentInfo.css";
 const AgentInfo = ({ agent = "" }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [modeList, setModeList] = useState<ModeData[]>([]);
-  const [info, setInfo] = useState("");
   const [currentMode, setCurrentMode] = useState<string>("simple-chat");
 
   const handleChange = (option: { value: string; label: React.ReactNode }) => {
@@ -24,7 +23,6 @@ const AgentInfo = ({ agent = "" }) => {
   };
   useEffect(() => {
     getAgentMode(agent).then(({ data, data: modes }) => {
-      setInfo(JSON.stringify(data));
       if (modes.all_modes) {
         setModeList([...modes.all_modes]);
       }
@@ -34,15 +32,27 @@ const AgentInfo = ({ agent = "" }) => {
       });
     });
   }, []);
+  // const changeAgentInfo = ()=>{
+
+  // }
+  const openChangeModal = () => {
+    // json schema render
+  };
   return (
     <div className="agent-info">
       {contextHolder}
       <div className="w-full h-8 leading-8 pl-2 border-b-1 border-b-1 border-gray-300 text-base color-set">
         <div className="flex ">
           <div>
-            <Button type="link">Agent : {agent}</Button>
+            <Button type="link" size="small">
+              Agent : {agent}
+            </Button>
+            <SettingFilled
+              style={{ color: "#1877F2" }}
+              onClick={openChangeModal}
+            />
           </div>
-          <div className="ml-2">
+          <div className="ml-8">
             <span className="text-sm"> 选择模式：</span>
             <Select
               labelInValue
