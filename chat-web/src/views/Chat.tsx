@@ -64,6 +64,7 @@ const Chat = ({ agent = "coco" }) => {
       };
     });
     setBubbles([...list]);
+    setStreamBubble([])
   };
   const sendMsg = async (content: string) => {
     if (streamBubble.length > 0) {
@@ -119,12 +120,12 @@ const Chat = ({ agent = "coco" }) => {
           ]);
         }
       }
-      setStreamBubble([]);
       const list = [
         ...streamBubble,
         { role: msgRole, content: fullContent, id: msgId, created },
       ];
       setBubbles((bubbles) => [...bubbles, ...list]);
+      setStreamBubble([]);
     }
   };
   const clearMessages = () => {

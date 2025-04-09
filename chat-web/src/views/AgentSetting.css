@@ -11,3 +11,6 @@
 .fr-header-desc {
   display: none;
 }
+.fr-obj-collapse .ant-collapse-header{
+  padding: 4px  12px !important;
+}
