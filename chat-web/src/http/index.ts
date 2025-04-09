@@ -115,7 +115,22 @@ export const getMessageContent = async (msgId: string) => {
 export const getRobotSchema = () => {
   return axios.get(`${BASE_URL}/body/status/schema`)
 }
+
 // 获取机器人硬件状态
 export const getRobotData = () => {
   return axios.get(`${BASE_URL}/body/status`)
+}
+
+// 获取Agent信息schema
+export const getAgentSchema = () => {
+  return axios.get(`${BASE_URL}/info/coco/get/schema`)
+}
+
+// 获取Agent信息schema
+export const getAgentData = () => {
+  return axios.get(`${BASE_URL}/info/coco/get`)
+}
+// 获取Agent信息修改权限
+export const changeAgentPermission = () => {
+  return axios.get(`${BASE_URL}/info/coco/permissions`)
 }

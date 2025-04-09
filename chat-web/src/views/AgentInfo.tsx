@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SettingFilled } from "@ant-design/icons";
 import { agentSwitchMode, getAgentMode } from "../http";
 import { Mode, ModeData } from "./../props";
+import AgentSetting from "./AgentSetting";
 import * as monaco from "monaco-editor";
 import "./AgentInfo.css";
 
@@ -47,10 +48,7 @@ const AgentInfo = ({ agent = "" }) => {
             <Button type="link" size="small">
               Agent : {agent}
             </Button>
-            <SettingFilled
-              style={{ color: "#1877F2" }}
-              onClick={openChangeModal}
-            />
+            <AgentSetting />
           </div>
           <div className="ml-8">
             <span className="text-sm"> 选择模式：</span>
