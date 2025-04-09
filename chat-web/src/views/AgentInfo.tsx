@@ -1,6 +1,5 @@
 import { Button, Select, message } from "antd";
 import { useEffect, useState } from "react";
-import { SettingFilled } from "@ant-design/icons";
 import { agentSwitchMode, getAgentMode } from "../http";
 import { Mode, ModeData } from "./../props";
 import AgentSetting from "./AgentSetting";

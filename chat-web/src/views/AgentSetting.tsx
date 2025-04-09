@@ -27,28 +27,31 @@ const AgentSetting = () => {
       //     console.log(formSchema[key])
       //   }
       // }
-      const originalSchema = res.data.schema
+      const originalSchema = res.data.schema;
       changeAgentPermission().then((res) => {
         const disArr = res.data.permissions.immutable_fields;
         setDisField([...disArr]);
-        console.log(originalSchema)
-        disArr.forEach((item:string) => {
-          console.log(item)
-          const keyArr = item.split('.')
-          if(originalSchema.properties[keyArr[0]] && originalSchema.properties[keyArr[0]].properties[keyArr[1]]){
-            originalSchema.properties[keyArr[0]].properties[keyArr[1]].disabled = true
+        console.log(originalSchema);
+        disArr.forEach((item: string) => {
+          console.log(item);
+          const keyArr = item.split(".");
+          if (
+            originalSchema.properties[keyArr[0]] &&
+            originalSchema.properties[keyArr[0]].properties[keyArr[1]]
+          ) {
+            originalSchema.properties[keyArr[0]].properties[
+              keyArr[1]
+            ].disabled = true;
           }
-          
         });
-        console.log(originalSchema)
-        setSchema(originalSchema)
-      });      
+        console.log(originalSchema);
+        setSchema(originalSchema);
+      });
     });
     getAgentData().then((res) => {
       setStatus(res.data.info);
       form.setValues(res.data.info);
     });
-    
   }, []);
   const onFinish = (formData) => {
     SetAgentInfo(formData).then((res) => {
