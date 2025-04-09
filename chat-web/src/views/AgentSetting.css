@@ -1,16 +1,15 @@
-.fr-desc{
+.fr-desc, .fr-header-desc{
   display: none;
 }
-.ant-col{
+.agent-setting .ant-col{
   margin-bottom: 4px;
   margin-top: 4px;
+  padding: 0;
 }
-.fr-obj-collapse{
+.agent-setting .fr-obj-collapse{
   margin-bottom: 0;
 }
-.fr-header-desc {
-  display: none;
-}
-.fr-obj-collapse .ant-collapse-header{
+
+.agent-setting .fr-obj-collapse .ant-collapse-header{
   padding: 4px  12px !important;
 }

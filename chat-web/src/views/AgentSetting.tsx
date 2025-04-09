@@ -69,6 +69,7 @@ const AgentSetting = () => {
         onClick={() => setIsModalOpen(true)}
       />
       <Modal
+        className="agent-setting"
         title="Coco参数配置"
         open={isModalOpen}
         footer={null}
