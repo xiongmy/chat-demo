@@ -25,14 +25,14 @@ app.get('/api/chat', (req, res) => {
     const params = new URLSearchParams(url.split('?')[1])
     const role = params.get('role')
     const content = params.get('content')
-    console.log(role, content)
+    // console.log(role, content)
     res.writeHead(200,{'Content-Type':'text/html;charset=utf-8'}); 
     sendReq(role, content).then((content) => {
         res.write(content);
         res.end();
     }
     ).catch((err) => {
-        console.log(err)
+        // console.log(err)
         res.json(err);
     })
 });

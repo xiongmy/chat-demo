@@ -42,11 +42,9 @@ const AgentInfo = ({ agent = "" }) => {
     getList();
   }, []);
 
-  console.log(agent);
   const getList = () => {
     getUserList().then((res) => {
       const list: user[] = res.data.user_list;
-      console.log(res);
       setUserList([...list]);
     });
   };
@@ -72,20 +70,17 @@ const AgentInfo = ({ agent = "" }) => {
     if (step === 1) {
       // 中断流程
       exitCreate().then((res) => {
-        console.log(res);
         resetCreate();
       });
     }
   };
   const deleteUser = (id: string) => {
     delUser(id).then((res) => {
-      console.log(res);
       messageApi.success("删除成功");
       getList();
     });
   };
   // const editUser = (id: string) => {
-  //   console.log(id);
   // };
   const stepItems = [
     {
@@ -103,14 +98,11 @@ const AgentInfo = ({ agent = "" }) => {
   const submitName = () => {
     if (name) {
       let timer: number;
-      console.log(name);
       createNewUser(name).then((res) => {
-        console.log(res);
         if (res.data.status === "success") {
           setStep(1);
           timer = window.setInterval(() => {
             getImgRes().then((img: any) => {
-              console.log(img.data.status);
               if (img.data.status === "success") {
                 clearInterval(timer);
                 setStep(2);

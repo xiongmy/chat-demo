@@ -39,7 +39,6 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use((response:any) => {
   //根据返回不同的状态码做不同的事情
   // 这里一定要和后台开发人员协商好统一的错误状态码
-  console.log(response)
   if (response.code) {
     switch (response.code) {
       case 200:

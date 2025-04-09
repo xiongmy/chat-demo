@@ -16,8 +16,6 @@ const App: React.FC = () => {
   document.documentElement.setAttribute('data-theme', value ? 'light' : 'dark')
   useEffect(() => {
     getAgent().then(({ data }) => {
-      console.log('当前Agent名字：' + data.main)
-      console.log(data)
       const main = data.main
       setAgent(main)
     })
@@ -47,7 +45,6 @@ const App: React.FC = () => {
             defaultChecked
             size='small'
             onClick={value => {
-              console.log(value)
               setValue(value)
               document.documentElement.setAttribute('data-theme', value ? 'light' : 'dark')
             }}

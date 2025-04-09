@@ -26,7 +26,6 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
 
   useEffect(() => {
     getRobotSchema().then(({ data }) => {
-      console.log(data);
       setRobotSchema(data.schema);
     });
     getRobotStatus()
@@ -35,7 +34,6 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
   const getRobotStatus = ()=>{
     setLoading(true)
     getRobotData().then(({ data }) => {
-      console.log(data);
       setRobotData(data.state);
       form.setValues(data.state);
       setLoading(false)

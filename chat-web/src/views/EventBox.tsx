@@ -30,9 +30,6 @@ const EventBox = ({ agent = 'simple-chat' }) => {
   useEffect(() => {
     getList()
   }, [])
-  // const onChange = (key: string | string[]) => {
-  //   console.log(key);
-  // };
   const getList = ()=>{
     getAgentMessage(agent).then(({data})=> {
       const list = data.messages.reverse().map(

@@ -99,7 +99,7 @@ export const getMessageContent = async (msgId: string) => {
 
     if (data.chunk) {
       fullContent += data.chunk.content; // 消息文本内容
-      console.log("收到部分回复:", data.chunk.content);
+      // console.log("收到部分回复:", data.chunk.content);
     }
 
     if (!data.chunk && !done) {
@@ -133,4 +133,10 @@ export const getAgentData = () => {
 // 获取Agent信息修改权限
 export const changeAgentPermission = () => {
   return axios.get(`${BASE_URL}/info/coco/permissions`)
+}
+// 设置Agent信息
+export const SetAgentInfo = (info) => {
+  return axios.post(`${BASE_URL}/info/coco/set`, {
+    info
+  },)
 }

@@ -83,7 +83,6 @@ const Chat = ({ agent = "coco" }) => {
     msgId = await pullMessageId();
     let msgRole = "";
     if (msgId) {
-      console.log("msgID: " + msgId);
       // 3. 获取消息内容
       let fullContent = "";
       let done = false;
@@ -120,7 +119,6 @@ const Chat = ({ agent = "coco" }) => {
           ]);
         }
       }
-      // console.log("完整回复:", fullContent);
       setStreamBubble([]);
       const list = [
         ...streamBubble,
