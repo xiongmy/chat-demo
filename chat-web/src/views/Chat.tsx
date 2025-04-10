@@ -33,10 +33,10 @@ const Chat = ({ agent = "coco" }) => {
   const [content, setContent] = useState("");
   const [bubbles, setBubbles] = useState<BubbleType[]>([]);
   const [streamBubble, setStreamBubble] = useState<BubbleType[]>([]);
-  const messageRef = useRef<HTMLInputElement>(null);
   const [senderLoading, setSenderLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [showWelcome, setShowWelcome] = useState(true);
+  const messageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -72,7 +72,7 @@ const Chat = ({ agent = "coco" }) => {
       await interruptMessage(agent);
     }
     await sendMessage(content);
-    setStreamBubble([{ role: "user", content }]);
+    setStreamBubble([{ role: "user", content, created: Math.floor(Date.now() / 1000) }]);
     setSenderLoading(true);
     setTimeout(() => {
       setSenderLoading(false);
@@ -80,8 +80,8 @@ const Chat = ({ agent = "coco" }) => {
   };
 
   const receiveMsg = async () => {
-    
-    const { msgId } = await pullMessageId();
+    let msgId = "";
+    msgId = await pullMessageId();
     console.log(msgId)
     let msgRole = "";
     if (msgId) {
