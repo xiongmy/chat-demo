@@ -25,17 +25,17 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
   const form = useForm();
 
   useEffect(() => {
-    getRobotSchema().then(({ data }) => {
-      setRobotSchema(data.schema);
+    getRobotSchema().then(({schema}) => {
+      setRobotSchema(schema);
     });
     getRobotStatus()
     
   }, []);
   const getRobotStatus = ()=>{
     setLoading(true)
-    getRobotData().then(({ data }) => {
-      setRobotData(data.state);
-      form.setValues(data.state);
+    getRobotData().then(({state}) => {
+      setRobotData(state);
+      form.setValues(state);
       setLoading(false)
     });
   }

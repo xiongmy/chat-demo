@@ -15,7 +15,7 @@ const App: React.FC = () => {
   const [value, setValue] = useState<boolean>(true)
   document.documentElement.setAttribute('data-theme', value ? 'light' : 'dark')
   useEffect(() => {
-    getAgent().then(({ data }) => {
+    getAgent().then((data: any) => {
       const main = data.main
       setAgent(main)
     })

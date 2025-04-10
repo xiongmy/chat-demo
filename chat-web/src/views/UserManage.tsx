@@ -43,8 +43,8 @@ const AgentInfo = ({ agent = "" }) => {
   }, []);
 
   const getList = () => {
-    getUserList().then((res) => {
-      const list: user[] = res.data.user_list;
+    getUserList().then((data) => {
+      const list: user[] = data.user_list;
       setUserList([...list]);
     });
   };
@@ -98,24 +98,22 @@ const AgentInfo = ({ agent = "" }) => {
   const submitName = () => {
     if (name) {
       let timer: number;
-      createNewUser(name).then((res) => {
-        if (res.data.status === "success") {
-          setStep(1);
-          timer = window.setInterval(() => {
-            getImgRes().then((img: any) => {
-              if (img.data.status === "success") {
-                clearInterval(timer);
-                setStep(2);
-                messageApi.success("新增成功");
-                setNewUser({
-                  id: img.data.user_id,
-                  name: name,
-                  image: img.data.user_image,
-                });
-              }
-            });
-          }, 1000);
-        }
+      createNewUser(name).then(() => {
+        setStep(1);
+        timer = window.setInterval(() => {
+          getImgRes().then((img: any) => {
+            if (img.status === "success") {
+              messageApi.success("新增成功");
+              clearInterval(timer);
+              setStep(2);
+              setNewUser({
+                id: img.user_id,
+                name: name,
+                image: img.user_image,
+              });
+            }
+          });
+        }, 1000);
       });
     }
   };

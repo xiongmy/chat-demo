@@ -53,9 +53,9 @@ const Chat = ({ agent = "coco" }) => {
     }
   }, [bubbles, streamBubble]);
   const updateBubbles = async () => {
-    const { data } = await getAgentMessage(agent);
-    if (data.messages.length) setShowWelcome(false);
-    const list = data.messages.map((msg) => {
+    const {messages} = await getAgentMessage(agent);
+    if (messages.length) setShowWelcome(false);
+    const list = messages.map((msg) => {
       return {
         role: msg.role,
         content: msg.content,
@@ -71,7 +71,7 @@ const Chat = ({ agent = "coco" }) => {
       // 消息中断
       await interruptMessage(agent);
     }
-    await sendMessage(content, "");
+    await sendMessage(content);
     setStreamBubble([{ role: "user", content }]);
     setSenderLoading(true);
     setTimeout(() => {
@@ -80,8 +80,9 @@ const Chat = ({ agent = "coco" }) => {
   };
 
   const receiveMsg = async () => {
-    let msgId = null;
-    msgId = await pullMessageId();
+    
+    const { msgId } = await pullMessageId();
+    console.log(msgId)
     let msgRole = "";
     if (msgId) {
       // 3. 获取消息内容
@@ -223,7 +224,7 @@ const Chat = ({ agent = "coco" }) => {
         {bubbleEle(bubbles)}
         {bubbleEle(streamBubble)}
       </div>
-      {showWelcome ? (
+      {bubbles.length===0 ? (
         <div className="w-3/5 m-auto my-2">
           <Welcome
             icon={<img src={welcomePng} />}

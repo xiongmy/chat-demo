@@ -1,19 +1,19 @@
-import axios from 'axios'
+import service from './service'
 import {BASE_URL, AGENT_ID, AGENT_HUB_URL, DEFAULT_USER_ID} from './config'
 
 // 获取agent
 export const getAgent = () => {
-  return axios.get(`${BASE_URL}/agents`)
+  return service.get(`${BASE_URL}/agents`)
 }
 
 // 获取agent的mode
 export const getAgentMode = (agent: string) => {
-  return axios.get(`${BASE_URL}/agents/${agent}`)
+  return service.get(`${BASE_URL}/agents/${agent}`)
 }
 
 // 获取agent 历史消息
 export const getAgentMessage = (agent: string) => {
-  return axios.get(`${BASE_URL}/agents/${agent}/messages`)
+  return service.get(`${BASE_URL}/agents/${agent}/messages`)
 }
 
 // 清空agent历史消息
@@ -30,7 +30,7 @@ export const clearAgentMessage = async (agent: string) => {
 
 // agent切换模式
 export const agentSwitchMode = (agent: string, mode: string) => {
-  return axios.put(`${BASE_URL}/agents/${agent}/switch`, { mode })
+  return service.put(`${BASE_URL}/agents/${agent}/switch`, { mode })
 }
 
 // 发送消息(AI会话)
@@ -113,30 +113,30 @@ export const getMessageContent = async (msgId: string) => {
 
 // 获取机器人硬件Schema
 export const getRobotSchema = () => {
-  return axios.get(`${BASE_URL}/body/status/schema`)
+  return service.get(`${BASE_URL}/body/status/schema`)
 }
 
 // 获取机器人硬件状态
 export const getRobotData = () => {
-  return axios.get(`${BASE_URL}/body/status`)
+  return service.get(`${BASE_URL}/body/status`)
 }
 
 // 获取Agent信息schema
 export const getAgentSchema = () => {
-  return axios.get(`${BASE_URL}/info/coco/get/schema`)
+  return service.get(`${BASE_URL}/info/coco/get/schema`)
 }
 
 // 获取Agent信息schema
 export const getAgentData = () => {
-  return axios.get(`${BASE_URL}/info/coco/get`)
+  return service.get(`${BASE_URL}/info/coco/get`)
 }
 // 获取Agent信息修改权限
 export const changeAgentPermission = () => {
-  return axios.get(`${BASE_URL}/info/coco/permissions`)
+  return service.get(`${BASE_URL}/info/coco/permissions`)
 }
 // 设置Agent信息
 export const SetAgentInfo = (info) => {
-  return axios.post(`${BASE_URL}/info/coco/set`, {
+  return service.post(`${BASE_URL}/info/coco/set`, {
     info
   },)
 }

@@ -12,7 +12,7 @@ const AgentInfo = ({ agent = "" }) => {
   const [currentMode, setCurrentMode] = useState<string>("simple-chat");
 
   const handleChange = (option: { value: string; label: React.ReactNode }) => {
-    agentSwitchMode(agent, option.value).then(({ data }) => {
+    agentSwitchMode(agent, option.value).then((data: any) => {
       if (data.ok) {
         setCurrentMode(option.value);
         messageApi.success("切换成功");
@@ -22,14 +22,14 @@ const AgentInfo = ({ agent = "" }) => {
     });
   };
   useEffect(() => {
-    getAgentMode(agent).then(({ data, data: modes }) => {
-      if (modes.all_modes) {
-        setModeList([...modes.all_modes]);
+    getAgentMode(agent).then((data: any) => {
+      if (data.all_modes) {
+        setModeList([...data.all_modes]);
       }
-      monaco.editor.create(document.getElementById("container"), {
-        value: JSON.stringify(data, null, 2),
-        language: "javascript",
-      });
+      // monaco.editor.create(document.getElementById("container"), {
+      //   value: JSON.stringify(data, null, 2),
+      //   language: "javascript",
+      // });
     });
   }, []);
   // const changeAgentInfo = ()=>{

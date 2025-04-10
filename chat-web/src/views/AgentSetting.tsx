@@ -1,4 +1,4 @@
-import { Modal, message } from "antd";
+import { Modal, message, Spin} from "antd";
 import { useEffect, useState } from "react";
 import {
   getAgentData,
@@ -16,24 +16,18 @@ const AgentSetting = () => {
   const [status, setStatus] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [disField, setDisField] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const form = useForm();
 
   useEffect(() => {
-    getAgentSchema().then((res) => {
-      // let formSchema = res.data.schema
-      // for(let key in formSchema){
-      //   console.log(formSchema[key])
-      //   for(let downkey in formSchema[key]){
-      //     console.log(formSchema[key])
-      //   }
-      // }
-      const originalSchema = res.data.schema;
-      changeAgentPermission().then((res) => {
-        const disArr = res.data.permissions.immutable_fields;
+    getAgentSchema().then(({ schema }) => {
+      const originalSchema = schema;
+      changeAgentPermission().then(({ permissions }) => {
+        const disArr = permissions.immutable_fields;
         setDisField([...disArr]);
-        console.log(originalSchema);
+        // console.log(originalSchema);
         disArr.forEach((item: string) => {
-          console.log(item);
+          // console.log(item);
           const keyArr = item.split(".");
           if (
             originalSchema.properties[keyArr[0]] &&
@@ -44,18 +38,19 @@ const AgentSetting = () => {
             ].disabled = true;
           }
         });
-        console.log(originalSchema);
         setSchema(originalSchema);
       });
     });
-    getAgentData().then((res) => {
-      setStatus(res.data.info);
-      form.setValues(res.data.info);
+    getAgentData().then(({ info }) => {
+      setStatus(info);
+      form.setValues(info);
     });
   }, []);
   const onFinish = (formData) => {
-    SetAgentInfo(formData).then((res) => {
-      if (res.data.success) {
+    setLoading(true);
+    SetAgentInfo(formData).then((data: any) => {
+      setLoading(false);
+      if (data.success) {
         messageApi.success("更新成功");
         handleCancel();
       }
@@ -78,16 +73,18 @@ const AgentSetting = () => {
         footer={null}
         onCancel={handleCancel}
       >
-        <FormRender
-          className="w-full"
-          style={{ maxHeight: "700px", overflowY: "auto", overflowX: "hidden" }}
-          maxWidth={360}
-          form={form}
-          schema={schema}
-          displayType="inline"
-          footer
-          onFinish={onFinish}
-        />
+        <Spin spinning={loading}>
+          <FormRender
+            className="w-full"
+            style={{ maxHeight: "700px", overflowY: "auto", overflowX: "hidden" }}
+            maxWidth={360}
+            form={form}
+            schema={schema}
+            displayType="inline"
+            footer
+            onFinish={onFinish}
+          />
+        </Spin>
       </Modal>
     </div>
   );
