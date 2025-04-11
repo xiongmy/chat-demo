@@ -15,7 +15,8 @@ export default defineConfig({
     host: '0.0.0.0',
     proxy: {
       '/service': {
-        target: 'http://10.168.1.128:20770',
+        target: 'http://192.168.1.13:20770',
+        // target: 'http://192.168.1.248:2077,
         changeOrigin: true,
         bypass(req, res, options) {
           const proxyURL = options.target + options.rewrite(req.url);

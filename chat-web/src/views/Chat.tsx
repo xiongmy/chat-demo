@@ -25,7 +25,11 @@ import welcomePng from "./../assets/welcome.png";
 const md = markdownit({ html: true, breaks: true });
 const renderMarkdown: BubbleProps["messageRender"] = (content) => (
   <div>
-    <div dangerouslySetInnerHTML={{ __html: md.render(content) }} />
+    {content ? (
+      <div dangerouslySetInnerHTML={{ __html: md.render(content) }} />
+    ) : (
+      <div>...</div>
+    )}
   </div>
 );
 
@@ -53,7 +57,7 @@ const Chat = ({ agent = "coco" }) => {
     }
   }, [bubbles, streamBubble]);
   const updateBubbles = async () => {
-    const {messages} = await getAgentMessage(agent);
+    const { messages } = await getAgentMessage(agent);
     if (messages.length) setShowWelcome(false);
     const list = messages.map((msg) => {
       return {
@@ -64,7 +68,7 @@ const Chat = ({ agent = "coco" }) => {
       };
     });
     setBubbles([...list]);
-    setStreamBubble([])
+    setStreamBubble([]);
   };
   const sendMsg = async (content: string) => {
     if (streamBubble.length > 0) {
@@ -72,7 +76,9 @@ const Chat = ({ agent = "coco" }) => {
       await interruptMessage(agent);
     }
     await sendMessage(content);
-    setStreamBubble([{ role: "user", content, created: Math.floor(Date.now() / 1000) }]);
+    setStreamBubble([
+      { role: "user", content, created: Math.floor(Date.now() / 1000) },
+    ]);
     setSenderLoading(true);
     setTimeout(() => {
       setSenderLoading(false);
@@ -82,7 +88,6 @@ const Chat = ({ agent = "coco" }) => {
   const receiveMsg = async () => {
     let msgId = "";
     msgId = await pullMessageId();
-    console.log(msgId)
     let msgRole = "";
     if (msgId) {
       // 3. 获取消息内容
@@ -100,20 +105,26 @@ const Chat = ({ agent = "coco" }) => {
         );
 
         const data = await response.json();
-
         if (data.chunk) {
           msgRole = data.chunk.role;
-          if (data.chunk.seq === "complete") {
+          if(data.chunk && data.chunk.type === 'image'){
             done = true;
-            fullContent = data.chunk.content; // 消息文本内容
-            created = data.chunk.created;
-          } else {
-            fullContent += data.chunk.content; // 消息文本内容
-          }
+            console.log(data.chunk)
+            // fullContent = '![image](http://192.168.1.248:20770/images/20250410_17_14_06_320x320.jpg)'
+            fullContent= `<img src="http://192.168.1.248:20770/images/20250410_17_14_06_320x320.jpg"  width="200" height="auto">`
+          }else{
+            if (data.chunk.seq === "complete") {
+              done = true;
+              fullContent = data.chunk.content; // 消息文本内容
+              created = data.chunk.created;
+            } else {
+              fullContent += data.chunk.content; // 消息文本内容
+            }
+          }    
 
           setStreamBubble([
             {
-              role: data.chunk.role,
+              role: msgRole,
               content: fullContent,
               id: data.chunk.msg_id,
               created,
@@ -130,9 +141,11 @@ const Chat = ({ agent = "coco" }) => {
     }
   };
   const clearMessages = () => {
+    interruptMessage(agent);
     clearAgentMessage(agent).then(() => {
       messageApi.info("已清空");
-      updateBubbles();
+      setBubbles([]);
+      setStreamBubble([]);
     });
   };
   const copyContent = (text: string) => {
@@ -224,7 +237,7 @@ const Chat = ({ agent = "coco" }) => {
         {bubbleEle(bubbles)}
         {bubbleEle(streamBubble)}
       </div>
-      {bubbles.length===0 ? (
+      {bubbles.length === 0 && streamBubble.length === 0 ? (
         <div className="w-3/5 m-auto my-2">
           <Welcome
             icon={<img src={welcomePng} />}

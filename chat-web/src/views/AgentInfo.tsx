@@ -26,10 +26,14 @@ const AgentInfo = ({ agent = "" }) => {
       if (data.all_modes) {
         setModeList([...data.all_modes]);
       }
-      // monaco.editor.create(document.getElementById("container"), {
-      //   value: JSON.stringify(data, null, 2),
-      //   language: "javascript",
-      // });
+      try {
+        monaco.editor?.create(document.getElementById("container"), {
+          value: JSON.stringify(data, null, 2),
+          language: "javascript",
+        });
+      } catch (e) {
+        console.log(e)
+      }
     });
   }, []);
   // const changeAgentInfo = ()=>{
