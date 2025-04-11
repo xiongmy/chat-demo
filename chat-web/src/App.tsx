@@ -28,10 +28,10 @@ const App: React.FC = () => {
       }}
     >
       <div className='w-full h-full flex p-4'>
-        <div className='color-set w-1/5 mr-2'>
+        <div className='color-set w-1/5 mr-1'>
           <RobotInfo agent={agent} themeMode={value} />
         </div>
-        <div className='color-set w-2/5 mr-2'>
+        <div className='color-set w-2/5 mr-1'>
           {/* <EventBox agent={agent} /> */}
           <AgentInfo agent={agent} />
         </div>
