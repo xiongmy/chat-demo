@@ -27,7 +27,7 @@ const App: React.FC = () => {
         algorithm: value ? theme.defaultAlgorithm : theme.darkAlgorithm,
       }}
     >
-      <div className='flex p-4'>
+      <div className='w-full h-full flex p-4'>
         <div className='color-set w-1/5 mr-2'>
           <RobotInfo agent={agent} themeMode={value} />
         </div>

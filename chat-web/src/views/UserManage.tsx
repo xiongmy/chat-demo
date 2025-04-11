@@ -126,7 +126,7 @@ const AgentInfo = ({ agent = "" }) => {
         size="small"
         onClick={() => setIsModalOpen(true)}
       >
-        用户管理
+        <span className="text-xs">用户管理</span>
       </Button>
       <Modal
         title={

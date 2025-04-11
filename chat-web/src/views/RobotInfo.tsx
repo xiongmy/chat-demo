@@ -77,9 +77,9 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
           <img src={avatar} />
         </div>
         <div className="ml-2">
-          <p className="text-base leading-6">Hi, 你好</p>
+          <p className="text-sm leading-6">Hi, 你好</p>
 
-          <p className="text-sm leading-6 text-gray-500">
+          <p className="text-xs leading-6 text-gray-500">
             我是你的机器人小助手
           </p>
           {/* {ip ? (

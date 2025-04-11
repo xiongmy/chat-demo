@@ -4,10 +4,12 @@ import {
   UserOutlined,
   CopyOutlined,
   ClearOutlined,
+  CloudUploadOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 import { Bubble, Sender, Welcome } from "@ant-design/x";
 import type { BubbleProps } from "@ant-design/x";
-import { Button, message } from "antd";
+import { Button, message, Flex, Typography } from "antd";
 import markdownit from "markdown-it";
 import { BubbleType } from "./../props";
 import { timestampToLocal } from "./../utils";
@@ -41,6 +43,8 @@ const Chat = ({ agent = "coco" }) => {
   const [senderLoading, setSenderLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [showWelcome, setShowWelcome] = useState(true);
+  const [open, setOpen] = useState(false);
+
   const messageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -108,12 +112,12 @@ const Chat = ({ agent = "coco" }) => {
         const data = await response.json();
         if (data.chunk) {
           msgRole = data.chunk.role;
-          if(data.chunk && data.chunk.type === 'image'){
+          if (data.chunk && data.chunk.type === "image") {
             done = true;
-            console.log(data.chunk)
+            console.log(data.chunk);
             // fullContent = '![image](http://192.168.1.248:20770/images/20250410_17_14_06_320x320.jpg)'
-            fullContent= `<img src="http://192.168.1.248:20770/images/20250410_17_14_06_320x320.jpg"  width="200" height="auto">`
-          }else{
+            fullContent = `<img src="http://192.168.1.248:20770/images/20250410_17_14_06_320x320.jpg"  width="200" height="auto">`;
+          } else {
             if (data.chunk.seq === "complete") {
               done = true;
               fullContent = data.chunk.content; // 消息文本内容
@@ -121,7 +125,7 @@ const Chat = ({ agent = "coco" }) => {
             } else {
               fullContent += data.chunk.content; // 消息文本内容
             }
-          }    
+          }
 
           setStreamBubble([
             {
@@ -195,11 +199,10 @@ const Chat = ({ agent = "coco" }) => {
         }
         footer={
           <div className="text-gray-500 text-xs">
-            <Button type="link" size="small">
-              <CopyOutlined
-                onClick={() => copyContent(bubble.content as string)}
-              />
-            </Button>
+            <CopyOutlined
+              style={{ fontSize: "12px" }}
+              onClick={() => copyContent(bubble.content as string)}
+            />
           </div>
         }
         avatar={{
@@ -215,17 +218,34 @@ const Chat = ({ agent = "coco" }) => {
 
     return elements;
   };
+  const headerNode = (
+    <Sender.Header title="Upload Sample" open={open} onOpenChange={setOpen}>
+      <Flex vertical align="center" gap="small">
+        <CloudUploadOutlined style={{ fontSize: "4em" }} />
+        <Typography.Title level={5} style={{ margin: 0 }}>
+          Drag file here (just demo)
+        </Typography.Title>
+        <Typography.Text type="secondary">
+          Support pdf, doc, xlsx, ppt, txt, image file types
+        </Typography.Text>
+        <Button
+          onClick={() => {
+            message.info("Mock select file");
+          }}
+        >
+          Select File
+        </Button>
+      </Flex>
+    </Sender.Header>
+  );
 
   return (
     <div className="w-full h-full relative">
       {contextHolder}
       <Title text="AI会话">
-      <div className="ml-4">
-            <Button type="primary" size="small" onClick={() => clearMessages()}>
-              <ClearOutlined />
-              清空
-            </Button>
-          </div>
+        <div className="text-sm leading-8 ml-4">
+          <ClearOutlined className="mr-2"  onClick={() => clearMessages()}/>
+        </div>
       </Title>
       <div
         ref={messageRef}
@@ -253,7 +273,16 @@ const Chat = ({ agent = "coco" }) => {
           }}
           value={content}
           loading={senderLoading}
-          allowSpeech
+          prefix={
+            <Button
+              type="text"
+              icon={<LinkOutlined />}
+              onClick={() => {
+                setOpen(!open);
+              }}
+            />
+          }
+          header={headerNode}
           onChange={setContent}
           onSubmit={(nextContent) => {
             afterInput(nextContent);
