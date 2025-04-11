@@ -4,12 +4,11 @@ import {
   UserOutlined,
   CopyOutlined,
   ClearOutlined,
-  CloudUploadOutlined,
-  LinkOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { Bubble, Sender, Welcome } from "@ant-design/x";
 import type { BubbleProps } from "@ant-design/x";
-import { Button, message, Flex, Typography } from "antd";
+import { message, Upload, Button, Image } from "antd";
 import markdownit from "markdown-it";
 import { BubbleType } from "./../props";
 import { timestampToLocal } from "./../utils";
@@ -19,11 +18,15 @@ import {
   getAgentMessage,
   interruptMessage,
   clearAgentMessage,
+  uploadImageHandle,
+  sendVision,
 } from "./../http";
 import { BASE_URL } from "./../http/config";
 import "./Chat.css";
 import welcomePng from "./../assets/welcome.png";
 import Title from "./../components/Title";
+import type { GetProp, UploadProps, UploadFile } from "antd";
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 const md = markdownit({ html: true, breaks: true });
 const renderMarkdown: BubbleProps["messageRender"] = (content) => (
@@ -43,7 +46,7 @@ const Chat = ({ agent = "coco" }) => {
   const [senderLoading, setSenderLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [showWelcome, setShowWelcome] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const messageRef = useRef<HTMLInputElement>(null);
 
@@ -183,7 +186,54 @@ const Chat = ({ agent = "coco" }) => {
   const afterInput = (msg: string) => {
     if (showWelcome) setShowWelcome(false);
     setContent("");
-    sendMsg(msg);
+    if (fileList.length > 0) {
+      sendFile(msg);
+    } else {
+      sendMsg(msg);
+    }
+  };
+  const sendFile = async (msg: string) => {
+    let filename = "";
+    const formData = new FormData();
+    formData.append("file", fileList[0] as FileType);
+    // setUploading(true);
+    await fetch("service/images", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log("上传成功");
+        console.log(res);
+        setFileList([]);
+        filename = res.filename;
+      })
+      .catch(() => {
+        message.error("upload failed.");
+      });
+    console.log(filename);
+    if (filename) {
+      await sendVision(filename);
+      sendMessage(msg);
+    }
+  };
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const props: UploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList([file]);
+      console.log(file)
+
+      return false;
+    },
+    fileList,
+    showUploadList: false,
   };
   const bubbleEle = (list: BubbleType[]) => {
     const elements = list.map((bubble, i) => (
@@ -218,33 +268,12 @@ const Chat = ({ agent = "coco" }) => {
 
     return elements;
   };
-  const headerNode = (
-    <Sender.Header title="Upload Sample" open={open} onOpenChange={setOpen}>
-      <Flex vertical align="center" gap="small">
-        <CloudUploadOutlined style={{ fontSize: "4em" }} />
-        <Typography.Title level={5} style={{ margin: 0 }}>
-          Drag file here (just demo)
-        </Typography.Title>
-        <Typography.Text type="secondary">
-          Support pdf, doc, xlsx, ppt, txt, image file types
-        </Typography.Text>
-        <Button
-          onClick={() => {
-            message.info("Mock select file");
-          }}
-        >
-          Select File
-        </Button>
-      </Flex>
-    </Sender.Header>
-  );
-
   return (
     <div className="w-full h-full relative">
       {contextHolder}
       <Title text="AI会话">
         <div className="text-sm leading-8 ml-4">
-          <ClearOutlined className="mr-2"  onClick={() => clearMessages()}/>
+          <ClearOutlined className="mr-2" onClick={() => clearMessages()} />
         </div>
       </Title>
       <div
@@ -266,6 +295,15 @@ const Chat = ({ agent = "coco" }) => {
         ""
       )}
       <div className="w-4/5 absolute bottom-0 bg-white" style={{ left: "10%" }}>
+        <div className="upload-box">
+          {fileList.length === 0 ? (
+            <Upload {...props}>
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+          ) : (
+            <p>{fileList[0]?.name}</p>
+          )}
+        </div>
         <Sender
           style={{
             maxWidth: "500px",
@@ -273,16 +311,6 @@ const Chat = ({ agent = "coco" }) => {
           }}
           value={content}
           loading={senderLoading}
-          prefix={
-            <Button
-              type="text"
-              icon={<LinkOutlined />}
-              onClick={() => {
-                setOpen(!open);
-              }}
-            />
-          }
-          header={headerNode}
           onChange={setContent}
           onSubmit={(nextContent) => {
             afterInput(nextContent);

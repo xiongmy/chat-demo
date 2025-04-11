@@ -7,3 +7,11 @@
     overflow-y: auto;
     /* background-color: greenyellow; */
 }
+
+.upload-box{
+    height: 45px;
+}
+.upload-box .ant-upload ,.upload-box .ant-upload-list-item-container{
+    width: 40px !important;
+    height: 40px !important;
+}

@@ -4,7 +4,7 @@ import {
   getAgentData,
   getAgentSchema,
   changeAgentPermission,
-  SetAgentInfo,
+  setAgentInfo,
 } from "./../http";
 import { SettingFilled } from "@ant-design/icons";
 import FormRender, { useForm } from "form-render";
@@ -48,7 +48,7 @@ const AgentSetting = () => {
   }, []);
   const onFinish = (formData) => {
     setLoading(true);
-    SetAgentInfo(formData).then((data: any) => {
+    setAgentInfo(formData).then((data: any) => {
       setLoading(false);
       if (data.success) {
         messageApi.success("更新成功");

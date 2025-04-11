@@ -52,6 +52,22 @@ export const sendMessage = async (content: string, userId = DEFAULT_USER_ID) => 
     body: JSON.stringify({ event })
   });
 }
+// 发送消息(视觉输入)
+export const sendVision = async (filename: string) => {
+  const visionEvent = {
+    event_type: "vision_input",
+    role: "user",  // 设置为用户角色
+    filenames: [filename],
+  };
+
+  await fetch(`${AGENT_HUB_URL}/agents/event`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event: visionEvent
+    }),  
+  });
+}
 
 // 中断消息
 export const interruptMessage = async (agent: string) => {
@@ -135,8 +151,18 @@ export const changeAgentPermission = () => {
   return service.get(`${BASE_URL}/info/coco/permissions`)
 }
 // 设置Agent信息
-export const SetAgentInfo = (info) => {
+export const setAgentInfo = (info) => {
   return service.post(`${BASE_URL}/info/coco/set`, {
     info
   },)
+}
+
+
+// 上传图片
+export const uploadImageHandle = async (formData) => {
+  await service.post(`${BASE_URL}/images`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 }

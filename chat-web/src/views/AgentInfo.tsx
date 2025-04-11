@@ -56,6 +56,7 @@ const AgentInfo = ({ agent = "" }) => {
         <div className="ml-8">
           <span className="text-sm"> 选择模式：</span>
           <Select
+          style={{ width: 150 }}
             labelInValue
             defaultValue={currentMode}
             size="small"
