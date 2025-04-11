@@ -1,6 +1,10 @@
 [data-theme="light"] {
-    --bgColor: #fefefe;
-    --textMainColor: #333;
+    --bgColor: #EEEFF3;
+    --containerBgColor: #FFFFFF;
+    --textMainColor: #707277;
     --textSecondColor: #999;
-    --borderColor: #aaa
+    --borderColor: #EEEFF3;
+    --fontSizeBig: 14px;
+    --fontSizeSmall: 12px;
+    --borderRadius: 8px;
 }

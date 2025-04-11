@@ -21,6 +21,7 @@ import {
 import { BASE_URL } from "./../http/config";
 import "./Chat.css";
 import welcomePng from "./../assets/welcome.png";
+import Title from "./../components/Title";
 
 const md = markdownit({ html: true, breaks: true });
 const renderMarkdown: BubbleProps["messageRender"] = (content) => (
@@ -218,21 +219,17 @@ const Chat = ({ agent = "coco" }) => {
   return (
     <div className="w-full h-full relative">
       {contextHolder}
-      <div className="w-full h-8 leading-8 pl-2 border-b-1 border-b-1 border-gray-300 text-base color-set">
-        <div className="flex ">
-          <p>AI会话</p>
-          <div className="ml-4">
+      <Title text="AI会话">
+      <div className="ml-4">
             <Button type="primary" size="small" onClick={() => clearMessages()}>
               <ClearOutlined />
               清空
             </Button>
           </div>
-        </div>
-      </div>
+      </Title>
       <div
         ref={messageRef}
-        className="m-2 rounded-sm p-2 overflow-y-auto overflow-x-hidden"
-        style={{ maxHeight: "80%" }}
+        className="bubble-list m-2 rounded-sm p-2 overflow-y-auto overflow-x-hidden"
       >
         {bubbleEle(bubbles)}
         {bubbleEle(streamBubble)}
@@ -262,7 +259,7 @@ const Chat = ({ agent = "coco" }) => {
             afterInput(nextContent);
           }}
         />
-        <p className="text-center ">
+        <p className="text-center text-xs ">
           {new Date().getFullYear() +
             "." +
             (new Date().getMonth() + 1) +

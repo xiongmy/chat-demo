@@ -71,7 +71,7 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
 
   return (
     <div className="robot-info text-base">
-      <Title text={"机器人信息"} />
+      <Title text={"机器人信息"} ></Title>
       <div className="avatar flex mx-2 my-4">
         <div className="w-12 h-12 rounded-full text-center  text-2xl leading-12">
           <img src={avatar} />
@@ -100,7 +100,7 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
         <UserManage agent={agent} />
       </div>
       <div className="m-2 device-list">
-        <p className="h-8 leading-8 text-base">配件列表 <Button type="link" onClick={getRobotStatus} className={loading?'animate-spin':''}><ReloadOutlined size={16} /></Button></p>
+        <p className="h-6 leading-6 text-sm">配件列表 <Button type="link" onClick={getRobotStatus} className={loading?'animate-spin':''} size="small"><ReloadOutlined size={16} /></Button></p>
         <FormRender
           className="w-full"
           readOnly={true}
@@ -115,8 +115,8 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
             },
           }}
         />
-        <p className="mt-2 h-8 leading-8 text-base">技能列表</p>
-        <ul className="leading-6 ml-4 text-sm">
+        <p className="mt-2 h-6 leading-6 text-sm">技能列表</p>
+        <ul className="leading-6 ml-4 text-xs">
           <li>人脸识别</li>
           <li>打招呼</li>
           <li>向前走</li>

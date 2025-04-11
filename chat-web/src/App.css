@@ -15,17 +15,14 @@ body{
   line-height: 64px;
   font-size: 24px;
   text-align: center;
-  border-bottom:1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 }
 
-.chat{
-  box-sizing: content-box;
-  border-left:1px solid #ddd;
-  border-right:1px solid #ddd;
-}
 .color-set{
-  background: var(--bgColor);
+  background:var(--containerBgColor);
   color: var(--textMainColor);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar

@@ -1,6 +1,10 @@
 [data-theme="dark"] {
-    --bgColor: #131e29;
+    --bgColor: #999;
+    --containerBgColor: #FFFFFF;
     --textMainColor: #fff;
     --textSecondColor: #eee;
-    --borderColor: #eee
+    --borderColor: #eee;
+    --fontSizeBig: 14px;
+    --fontSizeSmall: 12px;
+    --borderRadius: 8px;
 }

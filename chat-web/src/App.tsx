@@ -27,18 +27,18 @@ const App: React.FC = () => {
         algorithm: value ? theme.defaultAlgorithm : theme.darkAlgorithm,
       }}
     >
-      <div className='w-full h-full flex'>
-        <div className='color-set w-1/5'>
+      <div className='flex p-4'>
+        <div className='color-set w-1/5 mr-2'>
           <RobotInfo agent={agent} themeMode={value} />
         </div>
-        <div className='color-set chat w-2/5'>
+        <div className='color-set w-2/5 mr-2'>
           {/* <EventBox agent={agent} /> */}
           <AgentInfo agent={agent} />
         </div>
-        <div className='w-2/5 color-set'>
+        <div className='color-set w-2/5'>
           <Chat agent={agent} />
         </div>
-        <div className='fixed top-0 right-4'>
+        <div className='fixed top-4 right-6'>
           <Switch
             checkedChildren={<SunOutlined />}
             unCheckedChildren={<MoonOutlined />}

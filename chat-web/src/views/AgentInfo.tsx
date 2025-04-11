@@ -5,6 +5,7 @@ import { Mode, ModeData } from "./../props";
 import AgentSetting from "./AgentSetting";
 import * as monaco from "monaco-editor";
 import "./AgentInfo.css";
+import Title from "../components/Title";
 
 const AgentInfo = ({ agent = "" }) => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -32,7 +33,7 @@ const AgentInfo = ({ agent = "" }) => {
           language: "javascript",
         });
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     });
   }, []);
@@ -45,28 +46,27 @@ const AgentInfo = ({ agent = "" }) => {
   return (
     <div className="agent-info">
       {contextHolder}
-      <div className="w-full h-8 leading-8 pl-2 border-b-1 border-b-1 border-gray-300 text-base color-set">
-        <div className="flex ">
-          <div>
-            <Button type="link" size="small">
-              Agent : {agent}
-            </Button>
-            <AgentSetting />
-          </div>
-          <div className="ml-8">
-            <span className="text-sm"> 选择模式：</span>
-            <Select
-              labelInValue
-              defaultValue={currentMode}
-              size="small"
-              onChange={handleChange}
-              options={modeList?.map((mode: Mode) => {
-                return { label: mode.name, value: mode.id };
-              })}
-            />
-          </div>
+      <Title text="">
+        <div>
+          <Button type="link" size="small">
+            Agent : {agent}
+          </Button>
+          <AgentSetting />
         </div>
-      </div>
+        <div className="ml-8">
+          <span className="text-sm"> 选择模式：</span>
+          <Select
+            labelInValue
+            defaultValue={currentMode}
+            size="small"
+            onChange={handleChange}
+            options={modeList?.map((mode: Mode) => {
+              return { label: mode.name, value: mode.id };
+            })}
+          />
+        </div>
+      </Title>
+
       <div className="code-box mt-4">
         <div id="container" className="w-full h-full"></div>
       </div>
