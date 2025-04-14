@@ -318,7 +318,7 @@ const Chat = ({ agent = "coco", mode = "" }) => {
           {fileList.length === 0 ? (
             <Upload {...props}>
               <Button
-                className="mt-4"
+                className="mt-2"
                 icon={<LinkOutlined />}
                 type="link"
                 size="small"
