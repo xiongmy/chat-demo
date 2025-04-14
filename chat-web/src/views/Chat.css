@@ -19,3 +19,6 @@
 .clear-btn:hover{
     color:#1677ff;
 }
+.sender-box{
+  background:var(--containerBgColor);
+}

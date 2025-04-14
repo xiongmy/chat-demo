@@ -1,11 +1,12 @@
-import { Button, Select, message } from "antd";
-import { useEffect, useState } from "react";
+import { Button, Select, message, Input } from "antd";
+import { useEffect, useState, useRef } from "react";
 import { agentSwitchMode, getAgentMode } from "../http";
 import { Mode, ModeData } from "./../props";
 import AgentSetting from "./AgentSetting";
 import * as monaco from "monaco-editor";
 import "./AgentInfo.css";
 import Title from "../components/Title";
+import JSONFormatter from "json-formatter-js";
 interface AgentInfoProps {
   agent: string;
   onSwitch: () => void;
@@ -14,6 +15,8 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [modeList, setModeList] = useState<ModeData[]>([]);
   const [currentMode, setCurrentMode] = useState({ label: "", value: "" });
+  const [info, setInfo] = useState('');
+  const containerRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (option: { value: string; label: string }) => {
     agentSwitchMode(agent, option.value).then((data: any) => {
@@ -28,6 +31,9 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
   };
   useEffect(() => {
     getAgentMode(agent).then((data: any) => {
+      setInfo(data)
+      const formatter = new JSONFormatter(data);
+      containerRef.current?.appendChild(formatter.render());
       if (data.all_modes) {
         setModeList([...data.all_modes]);
         const current = data.all_modes.find((item) => item.id === data.current);
@@ -42,6 +48,7 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
   const openChangeModal = () => {
     // json schema render
   };
+
   return (
     <div className="agent-info">
       {contextHolder}
@@ -68,7 +75,9 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
       </Title>
 
       <div className="code-box mt-4">
-        <div id="container" className="w-full h-full"></div>
+        <div ref={containerRef} className="w-full h-full p-4">
+          {/* <Input type="textarea" className="w-full h-full" value={info} /> */}
+        </div>
       </div>
     </div>
   );

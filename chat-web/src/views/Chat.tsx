@@ -313,7 +313,7 @@ const Chat = ({ agent = "coco", mode = "" }) => {
       ) : (
         ""
       )}
-      <div className="w-4/5 absolute bottom-0 bg-white" style={{ left: "10%" }}>
+      <div className="w-4/5 absolute bottom-0 sender-box" style={{ left: "10%" }}>
         <div className="upload-box">
           {fileList.length === 0 ? (
             <Upload {...props}>
