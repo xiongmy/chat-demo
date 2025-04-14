@@ -313,7 +313,12 @@ const Chat = ({ agent = "coco", mode = "" }) => {
       ) : (
         ""
       )}
-      <div className="w-4/5 absolute bottom-0 sender-box" style={{ left: "10%" }}>
+      <div className="w-4/5 absolute bottom-0 sender-box" 
+        style={{ 
+          left: "10%", 
+          maxWidth: "500px",
+          margin: "0 auto" 
+        }}>
         <div className="upload-box">
           {fileList.length === 0 ? (
             <Upload {...props}>
@@ -338,10 +343,6 @@ const Chat = ({ agent = "coco", mode = "" }) => {
           )}
         </div>
         <Sender
-          style={{
-            maxWidth: "500px",
-            margin: "0 auto",
-          }}
           value={content}
           loading={senderLoading}
           onChange={setContent}
