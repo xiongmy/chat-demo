@@ -12,6 +12,7 @@ import { getAgent } from '@/http'
 
 const App: React.FC = () => {
   const [agent, setAgent] = useState('coco')
+  const [mode, setMode] = useState('')
   const [value, setValue] = useState<boolean>(true)
   document.documentElement.setAttribute('data-theme', value ? 'light' : 'dark')
   useEffect(() => {
@@ -20,6 +21,10 @@ const App: React.FC = () => {
       setAgent(main)
     })
   }, []);
+  const switchMode = (mode)=>{
+      console.log(mode)
+      setMode(mode)
+  }
   return (
     <ConfigProvider
       theme={{
@@ -33,10 +38,10 @@ const App: React.FC = () => {
         </div>
         <div className='color-set w-2/5 mr-1'>
           {/* <EventBox agent={agent} /> */}
-          <AgentInfo agent={agent} />
+          <AgentInfo agent={agent} mode={mode} onSwitch={switchMode}/>
         </div>
         <div className='color-set w-2/5'>
-          <Chat agent={agent} />
+          <Chat agent={agent} mode={mode}/>
         </div>
         <div className='fixed top-4 right-6'>
           <Switch

@@ -58,6 +58,7 @@ export const sendVision = async (filename: string) => {
     event_type: "vision_input",
     role: "user",  // 设置为用户角色
     filenames: [filename],
+    data:{}
   };
 
   await fetch(`${AGENT_HUB_URL}/agents/event`, {
@@ -159,10 +160,13 @@ export const setAgentInfo = (info) => {
 
 
 // 上传图片
-export const uploadImageHandle = async (formData) => {
-  await service.post(`${BASE_URL}/images`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+export const uploadImageHandle = (formData) => {
+  return fetch("service/images", {
+    method: "POST",
+    body: formData,
   });
+}
+
+export const getImageFullUrl = (name:string) => {
+  return service.get(`${BASE_URL}/images/${name}`)
 }

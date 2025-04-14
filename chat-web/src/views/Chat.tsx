@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 import {
   RobotOutlined,
   UserOutlined,
   CopyOutlined,
   ClearOutlined,
-  UploadOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 import { Bubble, Sender, Welcome } from "@ant-design/x";
 import type { BubbleProps } from "@ant-design/x";
@@ -39,14 +39,13 @@ const renderMarkdown: BubbleProps["messageRender"] = (content) => (
   </div>
 );
 
-const Chat = ({ agent = "coco" }) => {
+const Chat = ({ agent = "coco", mode = "" }) => {
   const [content, setContent] = useState("");
   const [bubbles, setBubbles] = useState<BubbleType[]>([]);
   const [streamBubble, setStreamBubble] = useState<BubbleType[]>([]);
   const [senderLoading, setSenderLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [showWelcome, setShowWelcome] = useState(true);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const messageRef = useRef<HTMLInputElement>(null);
 
@@ -60,6 +59,10 @@ const Chat = ({ agent = "coco" }) => {
     };
   }, []);
   useEffect(() => {
+    console.log("mode", mode);
+    updateBubbles();
+  }, [mode]);
+  useEffect(() => {
     if (messageRef.current !== null) {
       messageRef.current.scrollTop = messageRef.current.scrollHeight;
     }
@@ -70,7 +73,7 @@ const Chat = ({ agent = "coco" }) => {
     const list = messages.map((msg) => {
       return {
         role: msg.role,
-        content: msg.content,
+        content: msg.type === 'image' ?`<img src=${BASE_URL}/images/${msg.attrs.image_files[0]}  width='150' height='auto'>` : msg.content,
         msgId: msg.msg_id,
         created: msg.created,
       };
@@ -118,8 +121,11 @@ const Chat = ({ agent = "coco" }) => {
           if (data.chunk && data.chunk.type === "image") {
             done = true;
             console.log(data.chunk);
-            // fullContent = '![image](http://192.168.1.248:20770/images/20250410_17_14_06_320x320.jpg)'
-            fullContent = `<img src="http://192.168.1.248:20770/images/20250410_17_14_06_320x320.jpg"  width="200" height="auto">`;
+            if (data.chunk.attrs.image_files.length) {
+              const name = data.chunk.attrs.image_files[0];
+              const url = `${BASE_URL}/images/${name}`;
+              fullContent = `<img src=${url}  width="150" height="auto">`;
+            }
           } else {
             if (data.chunk.seq === "complete") {
               done = true;
@@ -197,27 +203,24 @@ const Chat = ({ agent = "coco" }) => {
     const formData = new FormData();
     formData.append("file", fileList[0] as FileType);
     // setUploading(true);
-    await fetch("service/images", {
-      method: "POST",
-      body: formData,
-    })
+    await uploadImageHandle(formData)
       .then((res) => res.json())
       .then((res) => {
-        console.log("上传成功");
-        console.log(res);
-        setFileList([]);
         filename = res.filename;
       })
       .catch(() => {
         message.error("upload failed.");
       });
-    console.log(filename);
     if (filename) {
+      console.log(filename);
       await sendVision(filename);
-      sendMessage(msg);
+      sendMsg(msg);
+      setImgUrl("");
+      setFileList([]);
     }
   };
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [imgUrl, setImgUrl] = useState("");
 
   const props: UploadProps = {
     onRemove: (file) => {
@@ -226,14 +229,23 @@ const Chat = ({ agent = "coco" }) => {
       newFileList.splice(index, 1);
       setFileList(newFileList);
     },
-    beforeUpload: (file) => {
-      setFileList([file]);
-      console.log(file)
+    beforeUpload: (file, fileList) => {
+      setFileList(fileList);
 
       return false;
     },
+    onChange: (info) => {
+      getBase64(info.file as FileType, (url) => {
+        setImgUrl(url);
+      });
+    },
     fileList,
-    showUploadList: false,
+    // showUploadList: false,
+  };
+  const getBase64 = (img: FileType, callback: (url: string) => void) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => callback(reader.result as string));
+    reader.readAsDataURL(img);
   };
   const bubbleEle = (list: BubbleType[]) => {
     const elements = list.map((bubble, i) => (
@@ -298,10 +310,17 @@ const Chat = ({ agent = "coco" }) => {
         <div className="upload-box">
           {fileList.length === 0 ? (
             <Upload {...props}>
-              <Button icon={<UploadOutlined />}>Select File</Button>
+              <Button
+                className="mt-4"
+                icon={<LinkOutlined />}
+                type="link"
+                size="small"
+              ></Button>
             </Upload>
           ) : (
-            <p>{fileList[0]?.name}</p>
+            <div>
+              <img src={imgUrl} style={{ width: "40px", height: "40px" }} />
+            </div>
           )}
         </div>
         <Sender

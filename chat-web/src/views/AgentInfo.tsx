@@ -6,8 +6,11 @@ import AgentSetting from "./AgentSetting";
 import * as monaco from "monaco-editor";
 import "./AgentInfo.css";
 import Title from "../components/Title";
-
-const AgentInfo = ({ agent = "" }) => {
+interface AgentInfoProps {
+  agent: string;
+  onSwitch: () => void;
+}
+const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [modeList, setModeList] = useState<ModeData[]>([]);
   const [currentMode, setCurrentMode] = useState<string>("simple-chat");
@@ -17,6 +20,7 @@ const AgentInfo = ({ agent = "" }) => {
       if (data.ok) {
         setCurrentMode(option.value);
         messageApi.success("切换成功");
+        onSwitch(option.value)
       } else {
         messageApi.warning("切换失败");
       }
