@@ -133,6 +133,7 @@ const Chat = ({ agent = "coco", mode = "" }) => {
               done = true;
               fullContent = data.chunk.content; // 消息文本内容
               created = data.chunk.created;
+              console.log(data.chunk.msg_id+','+data.chunk.role)
             } else {
               fullContent += data.chunk.content; // 消息文本内容
             }
