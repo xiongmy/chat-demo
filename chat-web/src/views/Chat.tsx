@@ -130,7 +130,7 @@ const Chat = ({ agent = "coco", mode = "" }) => {
             if (data.chunk.attrs.image_files.length) {
               const name = data.chunk.attrs.image_files[0];
               const url = `${BASE_URL}/images/${name}`;
-              fullContent = <img src={url} width="150" height="auto" />;
+              fullContent = `<img src=${url} width="150" height="auto" />`;
             }
           } else {
             if (data.chunk.seq === "complete") {
@@ -341,7 +341,7 @@ const clearFileList = ()=>{
           }}
           value={content}
           loading={senderLoading}
-          // onChange={setContent}
+          onChange={setContent}
           onSubmit={(nextContent) => {
             console.log(nextContent);
             afterInput(nextContent);
