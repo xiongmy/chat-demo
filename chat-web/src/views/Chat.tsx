@@ -64,7 +64,6 @@ const Chat = ({ agent = "coco", mode = "" }) => {
     };
   }, []);
   useEffect(() => {
-    console.log("mode", mode);
     updateBubbles();
   }, [mode]);
   useEffect(() => {
@@ -125,7 +124,6 @@ const Chat = ({ agent = "coco", mode = "" }) => {
           msgRole = data.chunk.role;
           if (data.chunk && data.chunk.type === "image") {
             done = true;
-            console.log(data.chunk);
             if (data.chunk.attrs.image_files.length) {
               const name = data.chunk.attrs.image_files[0];
               fullContent = name;
@@ -216,7 +214,6 @@ const Chat = ({ agent = "coco", mode = "" }) => {
         message.error("upload failed.");
       });
     if (filename) {
-      console.log(filename);
       await sendVision(filename);
       sendMsg(msg);
       setImgUrl("");
@@ -348,7 +345,6 @@ const Chat = ({ agent = "coco", mode = "" }) => {
           loading={senderLoading}
           onChange={setContent}
           onSubmit={(nextContent) => {
-            console.log(nextContent);
             afterInput(nextContent);
           }}
         />

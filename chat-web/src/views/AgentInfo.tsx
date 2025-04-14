@@ -13,14 +13,14 @@ interface AgentInfoProps {
 const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [modeList, setModeList] = useState<ModeData[]>([]);
-  const [currentMode, setCurrentMode] = useState<string>("simple-chat");
+  const [currentMode, setCurrentMode] = useState({ label: "", value: "" });
 
-  const handleChange = (option: { value: string; label: React.ReactNode }) => {
+  const handleChange = (option: { value: string; label: string }) => {
     agentSwitchMode(agent, option.value).then((data: any) => {
       if (data.ok) {
-        setCurrentMode(option.value);
+        setCurrentMode({ label: option.value, value: option.label });
         messageApi.success("切换成功");
-        onSwitch(option.value)
+        onSwitch(option.value);
       } else {
         messageApi.warning("切换失败");
       }
@@ -30,14 +30,9 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
     getAgentMode(agent).then((data: any) => {
       if (data.all_modes) {
         setModeList([...data.all_modes]);
-      }
-      try {
-        monaco.editor?.create(document.getElementById("container"), {
-          value: JSON.stringify(data, null, 2),
-          language: "javascript",
-        });
-      } catch (e) {
-        console.log(e);
+        const current = data.all_modes.find((item) => item.id === data.current);
+        console.log(current);
+        setCurrentMode({ label: current.name, value: current.id });
       }
     });
   }, []);
@@ -60,12 +55,12 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
         <div className="ml-8">
           <span className="text-sm"> 选择模式：</span>
           <Select
-          style={{ width: 150 }}
+            style={{ width: 150 }}
             labelInValue
-            defaultValue={currentMode}
+            value={currentMode}
             size="small"
             onChange={handleChange}
-            options={modeList?.map((mode: Mode) => {
+            options={modeList?.map((mode:any) => {
               return { label: mode.name, value: mode.id };
             })}
           />
