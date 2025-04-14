@@ -9,11 +9,11 @@
 }
 
 .upload-box{
-    height: 45px;
+    height: 36px;
 }
 .upload-box .ant-upload ,.upload-box .ant-upload-list-item-container{
-    width: 40px !important;
-    height: 40px !important;
+    width: 36px !important;
+    height: 36px !important;
 }
 
 .clear-btn:hover{

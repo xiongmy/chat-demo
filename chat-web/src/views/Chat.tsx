@@ -327,9 +327,9 @@ const Chat = ({ agent = "coco", mode = "" }) => {
           ) : (
             <div>
               <span className="relative">
-                <img src={imgUrl} style={{ width: "40px", height: "40px" }} />
+                <img src={imgUrl} style={{ width: "36px", height: "36px" }} />
                 <CloseCircleOutlined
-                  className="absolute -top-1 left-8 cursor-pointer"
+                  className="absolute top-0 left-8 cursor-pointer"
                   style={{ fontSize: "12px" }}
                   onClick={clearFileList}
                 />
