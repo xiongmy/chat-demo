@@ -27,6 +27,7 @@ import "./Chat.css";
 import welcomePng from "./../assets/welcome.png";
 import Title from "./../components/Title";
 import type { GetProp, UploadProps, UploadFile } from "antd";
+import BubbleImage from "../components/BubbleImage";
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 const md = markdownit({ html: true, breaks: true });
@@ -38,6 +39,9 @@ const renderMarkdown: BubbleProps["messageRender"] = (content) => (
       <div>...</div>
     )}
   </div>
+);
+const renderImage: BubbleProps["messageRender"] = (name) => (
+  <div>{name ? <BubbleImage url={name} /> : ""}</div>
 );
 
 const Chat = ({ agent = "coco", mode = "" }) => {
@@ -71,15 +75,13 @@ const Chat = ({ agent = "coco", mode = "" }) => {
   const updateBubbles = async () => {
     const { messages } = await getAgentMessage(agent);
     if (messages.length) setShowWelcome(false);
-    const list = messages.map((msg) => {
+    const list = messages.map((msg: any) => {
       return {
         role: msg.role,
-        content:
-          msg.type === "image"
-            ? `<img src=${BASE_URL}/images/${msg.attrs.image_files[0]}  alt=${msg.attrs.image_files[0]}  width='150' height='auto'>`
-            : msg.content,
+        content: msg.type === "image" ? msg.attrs.image_files[0] : msg.content,
         msgId: msg.msg_id,
         created: msg.created,
+        type: msg.type || 'text',
       };
     });
     setBubbles([...list]);
@@ -98,9 +100,6 @@ const Chat = ({ agent = "coco", mode = "" }) => {
     setTimeout(() => {
       setSenderLoading(false);
     }, 1000);
-  };
-  const closeImage = () => {
-    setFileList([]);
   };
   const receiveMsg = async () => {
     let msgId = "";
@@ -129,8 +128,7 @@ const Chat = ({ agent = "coco", mode = "" }) => {
             console.log(data.chunk);
             if (data.chunk.attrs.image_files.length) {
               const name = data.chunk.attrs.image_files[0];
-              const url = `${BASE_URL}/images/${name}`;
-              fullContent = `<img src=${url} width="150" height="auto" />`;
+              fullContent = name;
             }
           } else {
             if (data.chunk.seq === "complete") {
@@ -227,9 +225,9 @@ const Chat = ({ agent = "coco", mode = "" }) => {
   };
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [imgUrl, setImgUrl] = useState("");
-const clearFileList = ()=>{
-  setFileList([])
-}
+  const clearFileList = () => {
+    setFileList([]);
+  };
   const props: UploadProps = {
     onRemove: (file) => {
       const index = fileList.indexOf(file);
@@ -261,7 +259,7 @@ const clearFileList = ()=>{
         key={i}
         placement={bubble.role === "assistant" ? "start" : "end"}
         content={bubble.content}
-        messageRender={renderMarkdown}
+        messageRender={bubble.type === "image" ? renderImage : renderMarkdown}
         header={
           <p className={"text-xs"}>
             {timestampToLocal(bubble.created as number)}
@@ -293,7 +291,10 @@ const clearFileList = ()=>{
       {contextHolder}
       <Title text="AI会话">
         <div className="text-sm leading-8 ml-4">
-          <ClearOutlined className="mr-2 clear-btn" onClick={() => clearMessages()} />
+          <ClearOutlined
+            className="mr-2 clear-btn"
+            onClick={() => clearMessages()}
+          />
         </div>
       </Title>
       <div
@@ -329,7 +330,11 @@ const clearFileList = ()=>{
             <div>
               <span className="relative">
                 <img src={imgUrl} style={{ width: "40px", height: "40px" }} />
-                <CloseCircleOutlined className="absolute -top-1 left-8 cursor-pointer" style={{fontSize:'12px'}} onClick={clearFileList} />
+                <CloseCircleOutlined
+                  className="absolute -top-1 left-8 cursor-pointer"
+                  style={{ fontSize: "12px" }}
+                  onClick={clearFileList}
+                />
               </span>
             </div>
           )}

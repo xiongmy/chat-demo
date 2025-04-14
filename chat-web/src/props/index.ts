@@ -23,6 +23,7 @@ export interface BubbleType {
     role?: string,
     content?: string,
     created?: number,
+    type?: string,
 }
 export interface HistoryType {
     messageId: number,
