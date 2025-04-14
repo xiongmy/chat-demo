@@ -5,6 +5,7 @@ import {
   CopyOutlined,
   ClearOutlined,
   LinkOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 import { Bubble, Sender, Welcome } from "@ant-design/x";
 import type { BubbleProps } from "@ant-design/x";
@@ -73,7 +74,10 @@ const Chat = ({ agent = "coco", mode = "" }) => {
     const list = messages.map((msg) => {
       return {
         role: msg.role,
-        content: msg.type === 'image' ?`<img src=${BASE_URL}/images/${msg.attrs.image_files[0]}  width='150' height='auto'>` : msg.content,
+        content:
+          msg.type === "image"
+            ? `<img src=${BASE_URL}/images/${msg.attrs.image_files[0]}  alt=${msg.attrs.image_files[0]}  width='150' height='auto'>`
+            : msg.content,
         msgId: msg.msg_id,
         created: msg.created,
       };
@@ -95,7 +99,9 @@ const Chat = ({ agent = "coco", mode = "" }) => {
       setSenderLoading(false);
     }, 1000);
   };
-
+  const closeImage = () => {
+    setFileList([]);
+  };
   const receiveMsg = async () => {
     let msgId = "";
     msgId = await pullMessageId();
@@ -124,7 +130,7 @@ const Chat = ({ agent = "coco", mode = "" }) => {
             if (data.chunk.attrs.image_files.length) {
               const name = data.chunk.attrs.image_files[0];
               const url = `${BASE_URL}/images/${name}`;
-              fullContent = `<img src=${url}  width="150" height="auto">`;
+              fullContent = <img src={url} width="150" height="auto" />;
             }
           } else {
             if (data.chunk.seq === "complete") {
@@ -221,7 +227,9 @@ const Chat = ({ agent = "coco", mode = "" }) => {
   };
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [imgUrl, setImgUrl] = useState("");
-
+const clearFileList = ()=>{
+  setFileList([])
+}
   const props: UploadProps = {
     onRemove: (file) => {
       const index = fileList.indexOf(file);
@@ -285,7 +293,7 @@ const Chat = ({ agent = "coco", mode = "" }) => {
       {contextHolder}
       <Title text="AI会话">
         <div className="text-sm leading-8 ml-4">
-          <ClearOutlined className="mr-2" onClick={() => clearMessages()} />
+          <ClearOutlined className="mr-2 clear-btn" onClick={() => clearMessages()} />
         </div>
       </Title>
       <div
@@ -319,7 +327,10 @@ const Chat = ({ agent = "coco", mode = "" }) => {
             </Upload>
           ) : (
             <div>
-              <img src={imgUrl} style={{ width: "40px", height: "40px" }} />
+              <span className="relative">
+                <img src={imgUrl} style={{ width: "40px", height: "40px" }} />
+                <CloseCircleOutlined className="absolute -top-1 left-8 cursor-pointer" style={{fontSize:'12px'}} onClick={clearFileList} />
+              </span>
             </div>
           )}
         </div>
@@ -330,8 +341,9 @@ const Chat = ({ agent = "coco", mode = "" }) => {
           }}
           value={content}
           loading={senderLoading}
-          onChange={setContent}
+          // onChange={setContent}
           onSubmit={(nextContent) => {
+            console.log(nextContent);
             afterInput(nextContent);
           }}
         />

@@ -27,7 +27,7 @@ service.interceptors.request.use(config => {
   // }
   // console.log(config)
   //序列化请求参数，不然post请求参数后台接收不正常
-  console.log(config)
+  // console.log(config)
   // if(config.method === 'post'){
   //   config.data = JSON.stringify(config.data)
   // }

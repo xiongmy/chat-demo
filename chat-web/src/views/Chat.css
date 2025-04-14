@@ -15,3 +15,7 @@
     width: 40px !important;
     height: 40px !important;
 }
+
+.clear-btn:hover{
+    color:#1677ff;
+}
