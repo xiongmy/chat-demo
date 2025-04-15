@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, use } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   RobotOutlined,
   UserOutlined,
@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Bubble, Sender, Welcome } from "@ant-design/x";
 import type { BubbleProps } from "@ant-design/x";
-import { message, Upload, Button, Image } from "antd";
+import { message, Upload, Button } from "antd";
 import markdownit from "markdown-it";
 import { BubbleType } from "./../props";
 import { timestampToLocal } from "./../utils";
