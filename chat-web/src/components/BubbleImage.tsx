@@ -1,4 +1,5 @@
 import React from 'react';
+import { Image } from 'antd'
 import { BASE_URL } from "./../http/config";
 interface BubbleImageProps {
   url: string;
@@ -6,7 +7,7 @@ interface BubbleImageProps {
 
 const BubbleImage = React.memo(({ url }: BubbleImageProps) => {
   return (
-    <img src={`${BASE_URL}/images/${url}`} width='150' height='auto' />
+    <Image width={150}  src={`${BASE_URL}/images/${url}`} />
   );
 });
 
