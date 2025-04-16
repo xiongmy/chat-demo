@@ -1,44 +1,37 @@
 import { Modal, Input, message, Button, Collapse, theme } from "antd";
 import { useEffect, useState } from "react";
-import { ReloadOutlined } from "@ant-design/icons";
+import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import Title from "../components/Title";
 import { Mode, ModeData } from "./../props";
 import { getRobotSchema, getRobotData } from "./../http";
 import UserManage from "./UserManage";
+import SkillManage from "./SkillManage";
 import FormRender, { useForm } from "form-render";
 import avatar from "./../assets/avatar.png";
 import "./RobotInfo.css";
-interface RobotInfoType {
-  key: string;
-  label: string;
-  children: {
-    key: string;
-    label: string;
-  }[];
-}
 const RobotInfo = ({ agent = "", themeMode = "" }) => {
   const [ip, setIp] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [robotData, setRobotData] = useState({});
   const [robotSchema, setRobotSchema] = useState({});
   const [loading, setLoading] = useState(false);
+  const [skills, setSkills] = useState(['人脸识别', '打招呼', '向前走', '障碍识别']);
   const form = useForm();
 
   useEffect(() => {
-    getRobotSchema().then(({schema}) => {
+    getRobotSchema().then(({ schema }) => {
       setRobotSchema(schema);
     });
-    getRobotStatus()
-    
+    getRobotStatus();
   }, []);
-  const getRobotStatus = ()=>{
-    setLoading(true)
-    getRobotData().then(({state}) => {
+  const getRobotStatus = () => {
+    setLoading(true);
+    getRobotData().then(({ state }) => {
       setRobotData(state);
       form.setValues(state);
-      setLoading(false)
+      setLoading(false);
     });
-  }
+  };
   // const showModal = () => {
   //   setIsModalOpen(true);
   // };
@@ -68,10 +61,19 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
       </Modal>
     );
   };
+  const createSkill = (skill: string) => {
+    setSkills([...skills, skill]);
+  }
+  const skillList = ()=>{
+    const listItems= skills.map((skill, index) => 
+      <li key={index} className="cursor-pointer">{skill}</li>
+    )
+    return <ul className="leading-6 ml-4 text-xs">{listItems}</ul>
+  }
 
   return (
     <div className="robot-info text-base">
-      <Title text={"机器人信息"} ></Title>
+      <Title text={"机器人信息"}></Title>
       <div className="avatar flex mx-2 my-4">
         <div className="w-12 h-12 rounded-full text-center  text-2xl leading-12">
           <img src={avatar} />
@@ -99,29 +101,38 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
       <div className="w-full">
         <UserManage agent={agent} />
       </div>
-      <div className="m-2 device-list">
-        <p className="h-6 leading-6 text-sm">配件列表 <Button type="link" onClick={getRobotStatus} className={loading?'animate-spin':''} size="small"><ReloadOutlined size={16} /></Button></p>
-        <FormRender
-          className="w-full"
-          readOnly={true}
-          form={form}
-          schema={robotSchema}
-          displayType="inline"
-          configProvider={{
-            theme: {
-              algorithm: themeMode
-                ? theme.defaultAlgorithm
-                : theme.darkAlgorithm,
-            },
-          }}
-        />
-        <p className="mt-2 h-6 leading-6 text-sm">技能列表</p>
-        <ul className="leading-6 ml-4 text-xs">
-          <li>人脸识别</li>
-          <li>打招呼</li>
-          <li>向前走</li>
-          <li>障碍识别</li>
-        </ul>
+      <div className="m-2">
+        <p className="h-8 leading-8 text-sm">
+          配件列表{" "}
+          <Button
+            type="link"
+            onClick={getRobotStatus}
+            className={loading ? "animate-spin" : ""}
+            size="small"
+          >
+            <ReloadOutlined size={16} />
+          </Button>
+        </p>
+        <div className="device-list">
+          <FormRender
+            className="w-full"
+            readOnly={true}
+            form={form}
+            schema={robotSchema}
+            displayType="inline"
+            configProvider={{
+              theme: {
+                algorithm: themeMode
+                  ? theme.defaultAlgorithm
+                  : theme.darkAlgorithm,
+              },
+            }}
+          />
+        </div>
+        <div className="mt-2 h-8 leading-8 text-sm border-b-1 border-gray-200">技能列表  <SkillManage onCreate={createSkill} /></div>
+        <div className="device-list">
+            {skillList()}
+        </div>
       </div>
       <div className="real-video">
         <Title text={"实时视频流"} />
