@@ -19,7 +19,7 @@
   overflow: hidden;
 }
 .device-list{
-  max-height: calc(50vh - 230px);
+  max-height: calc(50vh - 220px);
   overflow-y: auto;
   overflow-x: hidden;
 }
