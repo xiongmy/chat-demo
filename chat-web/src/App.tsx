@@ -22,7 +22,6 @@ const App: React.FC = () => {
     })
   }, []);
   const switchMode = (mode)=>{
-      // console.log(mode)
       setMode(mode)
   }
   return (

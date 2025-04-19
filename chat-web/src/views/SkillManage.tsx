@@ -27,7 +27,6 @@ const AgentInfo = ({ agent = "", onCreate }) => {
     setIsModalOpen(false);
   };
   const onFinish = (values: any) => {
-    console.log(values);
     onCreate(values.name)
     setIsModalOpen(false);
     form.resetFields();

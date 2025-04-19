@@ -72,6 +72,7 @@ const AgentInfo = ({ agent = "" }) => {
       title: "ID",
       dataIndex: "id",
       key: "id",
+      ellipsis: true,
     },
     {
       title: "姓名",
@@ -183,7 +184,6 @@ const AgentInfo = ({ agent = "" }) => {
     });
   };
   const editUser = (user: object) => {
-    console.log(user);
     setState(Object.assign(state, user));
     setIsNewProgress(true);
   };

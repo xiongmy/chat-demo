@@ -35,9 +35,7 @@ const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
       // changeAgentPermission().then(({ permissions }) => {
       //   const disArr = permissions.immutable_fields;
       //   // setDisField([...disArr]);
-      //   // console.log(originalSchema);
       //   disArr.forEach((item: string) => {
-      //     // console.log(item);
       //     const keyArr = item.split(".");
       //     if (
       //       originalSchema.properties[keyArr[0]] &&
@@ -53,20 +51,15 @@ const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
     });
     getPersona()
     getAgentContracts(agent).then((data: any) => {
-      // console.log(data);
       setContractsInfo(data);
     });
     getAgentBaseConfig(agent).then((data: any) => {
-      // console.log(data);
       setBaseInfo(data);
     });
-    console.log(mode);
     getAgentModeSchema(agent, mode).then((schema) => {
-      console.log(schema);
       setModeSchema(schema);
     });
     getAgentModeConfig(agent, mode).then(({ state }) => {
-      console.log(state);
       setModeStatus(state);
     });
   }, []);

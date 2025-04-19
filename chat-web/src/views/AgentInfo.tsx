@@ -41,7 +41,6 @@ const AgentInfo: React.FC<AgentInfoProps> = ({
       if (data.all_modes) {
         setModeList([...data.all_modes]);
         const current = data.all_modes.find((item) => item.id === data.current);
-        console.log(current);
         onSwitch(current.id);
         setCurrentMode({ label: current.name, value: current.id });
       }
