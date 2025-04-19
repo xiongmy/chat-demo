@@ -51,10 +51,7 @@ const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
       // });
       setPersonaSchema(originalSchema);
     });
-    getAgentPersonaData().then(({ info }) => {
-      // setStatus(info);
-      setPersonaStatus(info);
-    });
+    getPersona()
     getAgentContracts(agent).then((data: any) => {
       // console.log(data);
       setContractsInfo(data);
@@ -73,8 +70,29 @@ const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
       setModeStatus(state);
     });
   }, []);
+  const getPersona = ()=>{
+    getAgentPersonaData().then((info) => {
+      // setStatus(info);
+      setPersonaStatus(info.persona);
+    });
+  }
 
-  const onFinish = (formData) => {
+  const onFinishPersona = (formData) => {
+    setLoading(true);
+    updateAgentPersona(formData).then((data: any) => {
+      setLoading(false);
+      if (data.ok) {
+        messageApi.success("更新成功");
+        handleCancel();
+        getPersona()
+      }
+    }).catch((err)=>{
+      messageApi.error(err);
+      setLoading(false);
+    });
+    
+  };
+  const onFinishMode = (formData) => {
     setLoading(true);
     updateAgentPersona(formData).then((data: any) => {
       setLoading(false);
@@ -108,7 +126,7 @@ const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
         <SchemaForm
           state={personaStatus}
           schema={personaSchema}
-          onFinish={onFinish}
+          onFinish={onFinishPersona}
         />
       ),
     },
@@ -120,7 +138,7 @@ const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
         <SchemaForm
           state={modeStatus}
           schema={modeSchema}
-          onFinish={onFinish}
+          onFinish={onFinishMode}
         />
       ),
     },

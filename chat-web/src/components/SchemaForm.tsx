@@ -12,13 +12,12 @@ const SchemaForm: React.FC<FormProps> = ({ state, schema, onFinish }) => {
   const form = useForm();
   useEffect(() => {
     form.setValues(state);
+    console.log('state更新')
+    console.log(state)
   }, [state]);
   return (
     <FormRender
       className="dynamic-form"
-      style={{
-        
-      }}
       size="small"
       maxWidth={360}
       form={form}
