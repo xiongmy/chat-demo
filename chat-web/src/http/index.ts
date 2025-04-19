@@ -153,7 +153,7 @@ export const changeAgentPermission = () => {
 }
 // 设置Agent信息
 export const updateAgentPersona = (info) => {
-  return service.put(`${BASE_URL}/agents/coco/persona`, info)
+  return service.post(`${BASE_URL}/agents/coco/persona`, info)
 }
 
 // 上传图片

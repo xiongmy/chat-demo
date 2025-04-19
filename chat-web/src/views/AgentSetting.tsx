@@ -78,10 +78,13 @@ const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
     setLoading(true);
     updateAgentPersona(formData).then((data: any) => {
       setLoading(false);
-      if (data.success) {
+      if (data.ok) {
         messageApi.success("更新成功");
         handleCancel();
       }
+    }).catch((err)=>{
+      messageApi.error(err);
+      setLoading(false);
     });
   };
   const showContent = (data) => {
@@ -152,6 +155,7 @@ const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
         open={isModalOpen}
         footer={null}
         onCancel={handleCancel}
+        maskClosable={false}
       >
           <Spin spinning={loading}>
             <Tabs defaultActiveKey="1" items={tabItems} onChange={onChange} />

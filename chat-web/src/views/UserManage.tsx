@@ -21,7 +21,6 @@ import {
   createNewUser,
   updateUser,
   getImgRes,
-  exitCreate,
   delUser,
   getUserSchema,
 } from "./../http/user";
@@ -34,20 +33,22 @@ interface user {
   name: string;
   image?: string;
 }
-
+const defaultUser = {
+  id: "",
+  name: "",
+  image_file: "",
+  birthday: "",
+  birthplace: "",
+  gender: "",
+  city: "",
+};
 const AgentInfo = ({ agent = "" }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewProgress, setIsNewProgress] = useState(false);
   const [step, setStep] = useState(0);
   const [state, setState] = useState({
-    id: "",
-    name: "",
-    image_file: "",
-    birthday: "",
-    birthplace: "",
-    gender: "",
-    city: "",
+    ...defaultUser,
   });
   const [schema, setSchema] = useState({});
   const [userList, setUserList] = useState<user[]>([]);
@@ -58,6 +59,7 @@ const AgentInfo = ({ agent = "" }) => {
       setSchema(res);
     });
   }, []);
+
   const columns = [
     {
       title: "ID",
@@ -93,6 +95,27 @@ const AgentInfo = ({ agent = "" }) => {
       title: "照片",
       dataIndex: "image_file",
       key: "image_file",
+      render: (_, record) => {
+        return (
+          <div>
+            {record.image_file ? (
+              <Image src={record.image_file} width={60} />
+            ) : (
+              ""
+            )}
+            <Button
+              size="small"
+              onClick={() => getFaceImage(record.id)}
+              type="link"
+            >
+              <span className="text-xs">
+                {" "}
+                {record.image_file ? "更新" : "设置"}
+              </span>
+            </Button>
+          </div>
+        );
+      },
     },
     {
       title: "操作",
@@ -101,7 +124,7 @@ const AgentInfo = ({ agent = "" }) => {
       render: (_, record) => {
         return (
           <div>
-            <Button type="link" size="small" onClick={()=>editUser(record)}>
+            <Button type="link" size="small" onClick={() => editUser(record)}>
               <EditOutlined style={{ color: "#1677ff" }} />
             </Button>
             <Popconfirm
@@ -136,29 +159,24 @@ const AgentInfo = ({ agent = "" }) => {
   const newUserOk = () => {
     setIsNewProgress(false);
     getList();
-    resetCreate();
-  };
-  const resetCreate = () => {
     setStep(0);
+    setState({
+      ...defaultUser,
+    });
   };
 
   const newUserCancel = () => {
-    setIsNewProgress(false);
-    if (step === 1) {
-      // 中断流程
-      exitCreate().then((res) => {
-        resetCreate();
-      });
-    }
+    newUserOk()
   };
   const deleteUser = (id: string) => {
     delUser(id).then(() => {
       messageApi.success("删除成功");
       getList();
+      setIsNewProgress(false);
     });
   };
   const editUser = (user: object) => {
-    console.log(user)
+    console.log(user);
     setState(Object.assign(state, user));
     setIsNewProgress(true);
   };
@@ -176,35 +194,32 @@ const AgentInfo = ({ agent = "" }) => {
     },
   ];
   const onfinishForm = (data) => {
-    if(data.id){
-      onEdit(data)
-    }else{
-      let timer: number;
-      createNewUser(Object.assign(data, { id: "" })).then(() => {
-        setStep(1);
-        timer = window.setInterval(() => {
-          getImgRes(id).then((img: any) => {
-            if (img.status === "success") {
-              messageApi.success("新增成功");
-              clearInterval(timer);
-              setStep(2);
-              setNewUser({
-                id: img.user_id,
-                name: name,
-                image: img.user_image,
-              });
-            }
-          });
-        }, 1000);
+    if (data.id) {
+      console.log('edit')
+      updateUser(data.id, data).then(() => {
+        messageApi.success("修改成功");
+        newUserOk();
+      });
+    } else {
+      console.log('create')
+      createNewUser(Object.assign(data, { id: "" })).then((data: any) => {
+        getFaceImage(data.user.id);
       });
     }
-    
   };
-  const onEdit = (data) => {
-    updateUser(data.id, data).then(() => {
-      messageApi.success("修改成功");
-      getList();
-    });
+  const getFaceImage = (id: string) => {
+    if (!id) return;
+    setIsNewProgress(true);
+    setStep(1);
+    getImgRes(id)
+      .then(() => {
+        messageApi.success("识别成功");
+        setStep(2);
+        getList();
+      })
+      .catch(() => {
+        messageApi.error("识别失败，请重试");
+      });
   };
   return (
     <div className="user-management">
@@ -221,30 +236,41 @@ const AgentInfo = ({ agent = "" }) => {
         title={
           <p className="flex h-8 leading-8">
             <span>用户管理</span>
-            <Button type="link">
+            <Button
+              type="link"
+              onClick={() => {
+                setStep(0)
+                setIsNewProgress(true);
+              }}
+            >
               新增
-              <PlusCircleOutlined
-                className="text-base"
-                onClick={() => setIsNewProgress(true)}
-              />
+              <PlusCircleOutlined className="text-base" />
             </Button>
           </p>
         }
-        width={600}
+        width={800}
+        height={500}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
         footer={null}
       >
         <div className="my-6">
-          <Table bordered dataSource={userList} columns={columns} size="small" pagination={false}/>    
+          <Table
+            bordered
+            dataSource={userList}
+            columns={columns}
+            size="small"
+            pagination={false}
+          />
         </div>
       </Modal>
       <Modal
-        title="新增用户"
+        title={state.id ? "修改用户" : "新增用户"}
         open={isNewProgress}
         onOk={newUserOk}
         onCancel={newUserCancel}
+        maskClosable={false}
         footer={null}
       >
         <Steps
@@ -253,23 +279,25 @@ const AgentInfo = ({ agent = "" }) => {
           labelPlacement="vertical"
           items={stepItems}
         />
-        <div className="my-20">
+        <div className="my-6">
           {step === 0 ? (
             <SchemaForm state={state} schema={schema} onFinish={onfinishForm} />
           ) : (
-            ''
+            ""
           )}
           {step === 1 ? (
-            <div className="text-center">
+            <div className="text-center mt-10">
               <Button
                 className="text-lg"
                 type="link"
                 size="large"
                 loading
               ></Button>
-              <p className=" text-gray-600">
+              <p className=" text-gray-600 mt-10">
                 人脸识别中...请保持人脸在屏幕中央
               </p>
+
+              {/* <Button className="mt-6" type="primary" onClick={()=>getFaceImage(state.id)}>重试</Button> */}
             </div>
           ) : (
             ""

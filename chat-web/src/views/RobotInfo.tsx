@@ -32,9 +32,9 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
       setLoading(false);
     });
   };
-  // const showModal = () => {
-  //   setIsModalOpen(true);
-  // };
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
 
   const handleOk = () => {
     if (ip) {
@@ -84,7 +84,7 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
           <p className="text-xs leading-6 text-gray-500">
             我是你的机器人小助手
           </p>
-          {/* {ip ? (
+          {ip ? (
             <p className="text-sm leading-6">
               IP: {ip}{" "}
               <Button type="link" size="small" onClick={() => setIp("")}>
@@ -95,7 +95,7 @@ const RobotInfo = ({ agent = "", themeMode = "" }) => {
             <Button type="primary" size="small" onClick={showModal}>
               连接
             </Button>
-          )} */}
+          )}
         </div>
       </div>
       <div className="w-full">
