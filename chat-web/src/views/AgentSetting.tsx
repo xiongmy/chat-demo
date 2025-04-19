@@ -1,54 +1,82 @@
-import { Modal, message, Spin} from "antd";
+import { Modal, message, Spin, Button, Tabs } from "antd";
 import { useEffect, useState } from "react";
 import {
-  getAgentData,
-  getAgentSchema,
-  changeAgentPermission,
-  setAgentInfo,
+  getAgentBaseConfig,
+  getAgentPersonaSchema,
+  getAgentPersonaData,
+  updateAgentPersona,
+  getAgentContracts,
+  getAgentModeConfig,
+  getAgentModeSchema,
 } from "./../http";
 import { SettingFilled } from "@ant-design/icons";
-import FormRender, { useForm } from "form-render";
+import type { TabsProps } from "antd";
+import JsonViewer from "../components/JsonViewer";
+import SchemaForm from "../components/SchemaForm";
 import "./AgentSetting.css";
-
-const AgentSetting = () => {
+interface Props {
+  agent: string;
+  mode: string;
+}
+const AgentSetting: React.FC<Props> = ({ agent, mode }) => {
   const [messageApi, contextHolder] = message.useMessage();
-  const [schema, setSchema] = useState({});
-  const [status, setStatus] = useState({});
+  const [personaSchema, setPersonaSchema] = useState({});
+  const [personaStatus, setPersonaStatus] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [disField, setDisField] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const form = useForm();
+  const [modeSchema, setModeSchema] = useState({});
+  const [modeStatus, setModeStatus] = useState({});
 
+  const [baseInfo, setBaseInfo] = useState({});
+  const [contractsInfo, setContractsInfo] = useState({});
   useEffect(() => {
-    getAgentSchema().then(({ schema }) => {
+    getAgentPersonaSchema().then((schema) => {
       const originalSchema = schema;
-      changeAgentPermission().then(({ permissions }) => {
-        const disArr = permissions.immutable_fields;
-        setDisField([...disArr]);
-        // console.log(originalSchema);
-        disArr.forEach((item: string) => {
-          // console.log(item);
-          const keyArr = item.split(".");
-          if (
-            originalSchema.properties[keyArr[0]] &&
-            originalSchema.properties[keyArr[0]].properties[keyArr[1]]
-          ) {
-            originalSchema.properties[keyArr[0]].properties[
-              keyArr[1]
-            ].disabled = true;
-          }
-        });
-        setSchema(originalSchema);
-      });
+      // changeAgentPermission().then(({ permissions }) => {
+      //   const disArr = permissions.immutable_fields;
+      //   // setDisField([...disArr]);
+      //   // console.log(originalSchema);
+      //   disArr.forEach((item: string) => {
+      //     // console.log(item);
+      //     const keyArr = item.split(".");
+      //     if (
+      //       originalSchema.properties[keyArr[0]] &&
+      //       originalSchema.properties[keyArr[0]].properties[keyArr[1]]
+      //     ) {
+      //       originalSchema.properties[keyArr[0]].properties[
+      //         keyArr[1]
+      //       ].disabled = true;
+      //     }
+      //   });
+      // });
+      setPersonaSchema(originalSchema);
     });
-    getAgentData().then(({ info }) => {
-      setStatus(info);
-      form.setValues(info);
+    getAgentPersonaData().then(({ info }) => {
+      // setStatus(info);
+      setPersonaStatus(info);
+    });
+    getAgentContracts(agent).then((data: any) => {
+      // console.log(data);
+      setContractsInfo(data);
+    });
+    getAgentBaseConfig(agent).then((data: any) => {
+      // console.log(data);
+      setBaseInfo(data);
+    });
+    console.log(mode);
+    getAgentModeSchema(agent, mode).then((schema) => {
+      console.log(schema);
+      setModeSchema(schema);
+    });
+    getAgentModeConfig(agent, mode).then(({ state }) => {
+      console.log(state);
+      setModeStatus(state);
     });
   }, []);
+
   const onFinish = (formData) => {
     setLoading(true);
-    setAgentInfo(formData).then((data: any) => {
+    updateAgentPersona(formData).then((data: any) => {
       setLoading(false);
       if (data.success) {
         messageApi.success("更新成功");
@@ -56,6 +84,49 @@ const AgentSetting = () => {
       }
     });
   };
+  const showContent = (data) => {
+    return <div className="overflow-y-auto max-h-[600px]"><JsonViewer json={data} /></div>;
+  };
+  const tabItems: TabsProps["items"] = [
+    {
+      key: "1",
+      label: "基本配置",
+      children: showContent(baseInfo),
+    },
+    {
+      key: "2",
+      label: "contracts ",
+      children: showContent(contractsInfo),
+    },
+    {
+      key: "3",
+      label: "persona 配置",
+      children: (
+        <SchemaForm
+          state={personaStatus}
+          schema={personaSchema}
+          onFinish={onFinish}
+        />
+      ),
+    },
+
+    {
+      key: "4",
+      label: "mode 配置",
+      children: (
+        <SchemaForm
+          state={modeStatus}
+          schema={modeSchema}
+          onFinish={onFinish}
+        />
+      ),
+    },
+  ];
+
+  const onChange = (key) => {
+    console.log(key);
+  };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -67,24 +138,24 @@ const AgentSetting = () => {
         onClick={() => setIsModalOpen(true)}
       />
       <Modal
+        width={800}
         className="agent-setting"
-        title="Coco参数配置"
+        title={
+          <span>
+            Agent设置
+            <span className="rounded bg-green-500 text-white text-xs px-1 ml-2 ">
+              {/* speech-chat */}
+              {mode}
+            </span>
+          </span>
+        }
         open={isModalOpen}
         footer={null}
         onCancel={handleCancel}
       >
-        <Spin spinning={loading}>
-          <FormRender
-            className="w-full"
-            style={{ maxHeight: "700px", overflowY: "auto", overflowX: "hidden" }}
-            maxWidth={360}
-            form={form}
-            schema={schema}
-            displayType="inline"
-            footer
-            onFinish={onFinish}
-          />
-        </Spin>
+          <Spin spinning={loading}>
+            <Tabs defaultActiveKey="1" items={tabItems} onChange={onChange} />
+          </Spin>
       </Modal>
     </div>
   );

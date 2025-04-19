@@ -1,5 +1,5 @@
 import service from './service'
-import {BASE_URL, AGENT_ID, AGENT_HUB_URL, DEFAULT_USER_ID} from './config'
+import {BASE_URL,TEMP_URL, AGENT_ID, AGENT_HUB_URL, DEFAULT_USER_ID} from './config'
 
 // 获取agent
 export const getAgent = () => {
@@ -139,25 +139,22 @@ export const getRobotData = () => {
 }
 
 // 获取Agent信息schema
-export const getAgentSchema = () => {
-  return service.get(`${BASE_URL}/info/coco/get/schema`)
+export const getAgentPersonaSchema = () => {
+  return service.get(`${BASE_URL}/agents/persona/schema`)
 }
 
 // 获取Agent信息schema
-export const getAgentData = () => {
-  return service.get(`${BASE_URL}/info/coco/get`)
+export const getAgentPersonaData = () => {
+  return service.get(`${BASE_URL}/agents/coco/persona`)
 }
 // 获取Agent信息修改权限
 export const changeAgentPermission = () => {
   return service.get(`${BASE_URL}/info/coco/permissions`)
 }
 // 设置Agent信息
-export const setAgentInfo = (info) => {
-  return service.post(`${BASE_URL}/info/coco/set`, {
-    info
-  },)
+export const updateAgentPersona = (info) => {
+  return service.put(`${BASE_URL}/agents/coco/persona`, info)
 }
-
 
 // 上传图片
 export const uploadImageHandle = (formData) => {
@@ -169,4 +166,39 @@ export const uploadImageHandle = (formData) => {
 
 export const getImageFullUrl = (name:string) => {
   return service.get(`${BASE_URL}/images/${name}`)
+}
+
+// 获取agent contracts
+export const getAgentContracts = (agent:string) => {
+  return service.get(`${BASE_URL}/agents/${agent}/contracts`)
+}
+
+// 获取agent 基本配置
+export const getAgentBaseConfig = (agent:string) => {
+  return service.get(`${BASE_URL}/agents/${agent}/config`)
+}
+
+// 获取agent 的mode schema
+export const getAgentModeSchema = (agent:string, mode:string) => {
+  return service.get(`${BASE_URL}/agents/${agent}/mode/${mode}/schema`)
+}
+
+// 获取agent 的mode data
+export const getAgentModeConfig = (agent:string, mode:string) => {
+  return service.get(`${BASE_URL}/agents/${agent}/mode/${mode}/config`)
+}
+
+// 设置agent 的mode data
+export const setAgentModeConfig = (agent:string, mode:string, data:any) => {
+  return service.post(`${BASE_URL}/${agent}/mode/${mode}/config`,data)
+}
+
+// 获取agent 的mode data
+export const getAgentInstructions = (agent:string) => {
+  return service.get(`${BASE_URL}/${agent}/instructions`)
+}
+
+// 重启agent
+export const restartAgent = (agent:string) => {
+  return service.put(`${BASE_URL}/${agent}/restart`)
 }

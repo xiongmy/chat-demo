@@ -3,19 +3,23 @@ import { useEffect, useState, useRef } from "react";
 import { agentSwitchMode, getAgentMode } from "../http";
 import { Mode, ModeData } from "./../props";
 import AgentSetting from "./AgentSetting";
-import * as monaco from "monaco-editor";
 import "./AgentInfo.css";
 import Title from "../components/Title";
 import JSONFormatter from "json-formatter-js";
 interface AgentInfoProps {
   agent: string;
-  onSwitch: () => void;
+  mode: string;
+  onSwitch: (mode: string) => void;
 }
-const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
+const AgentInfo: React.FC<AgentInfoProps> = ({
+  agent = "",
+  mode = "",
+  onSwitch,
+}) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [modeList, setModeList] = useState<ModeData[]>([]);
   const [currentMode, setCurrentMode] = useState({ label: "", value: "" });
-  const [info, setInfo] = useState('');
+  const [info, setInfo] = useState("");
   const containerRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (option: { value: string; label: string }) => {
@@ -31,23 +35,18 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
   };
   useEffect(() => {
     getAgentMode(agent).then((data: any) => {
-      setInfo(data)
+      setInfo(data);
       const formatter = new JSONFormatter(data);
       containerRef.current?.appendChild(formatter.render());
       if (data.all_modes) {
         setModeList([...data.all_modes]);
         const current = data.all_modes.find((item) => item.id === data.current);
         console.log(current);
+        onSwitch(current.id);
         setCurrentMode({ label: current.name, value: current.id });
       }
     });
   }, []);
-  // const changeAgentInfo = ()=>{
-
-  // }
-  const openChangeModal = () => {
-    // json schema render
-  };
 
   return (
     <div className="agent-info">
@@ -57,7 +56,7 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
           <Button type="link" size="small">
             Agent : {agent}
           </Button>
-          <AgentSetting />
+          {agent && mode ? <AgentSetting agent={agent} mode={mode} /> : ""}
         </div>
         <div className="ml-8">
           <span className="text-sm"> 选择模式：</span>
@@ -67,14 +66,14 @@ const AgentInfo: React.FC<AgentInfoProps> = ({ agent = "", onSwitch }) => {
             value={currentMode}
             size="small"
             onChange={handleChange}
-            options={modeList?.map((mode:any) => {
+            options={modeList?.map((mode: any) => {
               return { label: mode.name, value: mode.id };
             })}
           />
         </div>
       </Title>
 
-      <div className="code-box mt-4">
+      <div className="code-box m-4">
         <div ref={containerRef} className="w-full h-full p-4">
           {/* <Input type="textarea" className="w-full h-full" value={info} /> */}
         </div>

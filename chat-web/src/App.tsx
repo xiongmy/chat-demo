@@ -22,7 +22,7 @@ const App: React.FC = () => {
     })
   }, []);
   const switchMode = (mode)=>{
-      console.log(mode)
+      // console.log(mode)
       setMode(mode)
   }
   return (
@@ -41,7 +41,7 @@ const App: React.FC = () => {
           <AgentInfo agent={agent} mode={mode} onSwitch={switchMode}/>
         </div>
         <div className='color-set w-2/5'>
-          <Chat agent={agent} mode={mode}/>
+          <Chat agent={agent} mode={mode} />
         </div>
         <div className='fixed top-4 right-6'>
           <Switch

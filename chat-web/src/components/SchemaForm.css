@@ -1,0 +1,9 @@
+.dynamic-form {
+  width: 100%;
+  max-height: 700px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+:where(.css-dev-only-do-not-override-240cud).ant-form-item {
+  margin-bottom: 8px;
+}
