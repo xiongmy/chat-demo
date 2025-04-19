@@ -54,12 +54,12 @@ const AgentInfo: React.FC<AgentInfoProps> = ({
       <Title text="">
         <div>
           <Button type="link" size="small">
-            Agent : {agent}
+            Agent: {agent}
           </Button>
           {agent && mode ? <AgentSetting agent={agent} mode={mode} /> : ""}
         </div>
         <div>
-          <span className="text-sm"> 选择模式：</span>
+          <span className="text-sm">选择模式: </span>
           <Select
             labelInValue
             value={currentMode}

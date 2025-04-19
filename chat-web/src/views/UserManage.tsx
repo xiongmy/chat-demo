@@ -62,6 +62,13 @@ const AgentInfo = ({ agent = "" }) => {
 
   const columns = [
     {
+      title: "序号",
+      dataIndex: "index",
+      key: "index",
+      render: (_, record, index) => index + 1,
+
+    },
+    {
       title: "ID",
       dataIndex: "id",
       key: "id",
@@ -166,7 +173,7 @@ const AgentInfo = ({ agent = "" }) => {
   };
 
   const newUserCancel = () => {
-    newUserOk()
+    newUserOk();
   };
   const deleteUser = (id: string) => {
     delUser(id).then(() => {
@@ -195,13 +202,13 @@ const AgentInfo = ({ agent = "" }) => {
   ];
   const onfinishForm = (data) => {
     if (data.id) {
-      console.log('edit')
+      console.log("edit");
       updateUser(data.id, data).then(() => {
         messageApi.success("修改成功");
         newUserOk();
       });
     } else {
-      console.log('create')
+      console.log("create");
       createNewUser(Object.assign(data, { id: "" })).then((data: any) => {
         getFaceImage(data.user.id);
       });
@@ -239,7 +246,7 @@ const AgentInfo = ({ agent = "" }) => {
             <Button
               type="link"
               onClick={() => {
-                setStep(0)
+                setStep(0);
                 setIsNewProgress(true);
               }}
             >
@@ -251,9 +258,9 @@ const AgentInfo = ({ agent = "" }) => {
         width={800}
         height={500}
         open={isModalOpen}
+        footer={null}
         onOk={handleOk}
         onCancel={handleCancel}
-        footer={null}
       >
         <div className="my-6">
           <Table
@@ -262,6 +269,7 @@ const AgentInfo = ({ agent = "" }) => {
             columns={columns}
             size="small"
             pagination={false}
+            scroll={{ y: 50 * 6 }}
           />
         </div>
       </Modal>
@@ -296,7 +304,6 @@ const AgentInfo = ({ agent = "" }) => {
               <p className=" text-gray-600 mt-10">
                 人脸识别中...请保持人脸在屏幕中央
               </p>
-
               {/* <Button className="mt-6" type="primary" onClick={()=>getFaceImage(state.id)}>重试</Button> */}
             </div>
           ) : (
